@@ -246,3 +246,15 @@ fabric.properties
 # modules.xml
 # .idea/misc.xml
 # *.ipr
+
+.idea
+
+# ignore content of uploads folder
+uploads/*
+# except one (empty) file to have the folder in version control
+!uploads/.gitkeep
+
+# ignore content of uploads folder
+thumbnails/*
+# except one (empty) file to have the folder in version control
+!thumbnails/.gitkeep

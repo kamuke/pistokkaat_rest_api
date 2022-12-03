@@ -4,7 +4,8 @@ const plantModel = require('../models/plantModel');
 
 const plants = plantModel.plants; 
 
-const plant_list_get = (req, res) => {
+const plant_list_get = async (req, res) => {
+    const plants = await plantModel.getAllPlants();
     res.json(plants);
 };
 

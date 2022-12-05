@@ -1,19 +1,21 @@
 // userModel
 'use strict';
 const pool = require('../database/db');
+const {httpError} = require('../utils/errors');
 const promisePool = pool.promise();
 
-const getAllUsers = async () => {
+const getAllUsers = async (next) => {
     try {
         const [rows] = await promisePool.query(`SELECT user_id, email, username, municipality, role
                                                 FROM user;`);
         return rows;
     } catch (e) {
         console.error('getAllUsers', e.message);
+        next(httpError('Database error', 500));
     }
 };
 
-const getUser = async (userId) => {
+const getUser = async (userId, next) => {
     try {
         const [rows] = await promisePool.query(`SELECT user_id, email, username, municipality, role
                                                 FROM user
@@ -21,20 +23,22 @@ const getUser = async (userId) => {
         return rows;
     } catch (e) {
         console.error('getUser', e.message);
+        next(httpError('Database error', 500));
     }
 };
 
-const addUser = async (data) => {
+const addUser = async (data, next) => {
     try {
         const [rows] = await promisePool.query(`INSERT INTO user(email, username, password, municipality) 
                                                 VALUES(?, ?, ?, ?);`, data);
         return rows;
     } catch (e) {
         console.error('addUser', e.message);
+        next(httpError('Database error', 500));
     }
 };
 
-const updateUser = async (data) => {
+const updateUser = async (data, next) => {
     try {
         const [rows] = await promisePool.execute(`UPDATE user 
                                                 SET email = ?, username = ?, password = ?, municipality = ? 
@@ -42,15 +46,17 @@ const updateUser = async (data) => {
         return rows;
     } catch (e) {
         console.error('updateUser', e.message);
+        next(httpError('Database error', 500));
     }
 };
 
-const deleteUser = async (userId) => {
+const deleteUser = async (userId, next) => {
     try {
         const [rows] = await promisePool.execute(`DELETE FROM user WHERE user_id = ?;`, [userId]);
         return rows;
     } catch (e) {
         console.error('deleteUser', e.message);
+        next(httpError('Database error', 500));
     }
 };
 

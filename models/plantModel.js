@@ -1,10 +1,11 @@
 // catModel
 'use strict';
 const pool = require('../database/db');
+const {httpError} = require('../utils/errors');
 const promisePool = pool.promise();
 
 // TODO: search in this same get?
-const getAllPlants = async () => {
+const getAllPlants = async (next) => {
     try {
         const [rows] = await promisePool.query(`SELECT 		plant.plant_id, 
                                                             plant.name, 
@@ -31,10 +32,11 @@ const getAllPlants = async () => {
         return rows;
     } catch (e) {
         console.error('getAllPlants', e.message);
+        next(httpError('Database error', 500));
     }
 };
 
-const getPlant = async (plantId) => {
+const getPlant = async (plantId, next) => {
     try {
         const [rows] = await promisePool.query(`SELECT        plant.plant_id, 
                                                             plant.name, 
@@ -61,11 +63,12 @@ const getPlant = async (plantId) => {
         return rows;
     } catch (e) {
         console.error('getPlant', e.message);
+        next(httpError('Database error', 500));
     }
 };
 
 // TODO: Only logged users can add plants
-const addPlant = async(data, delivery) => {
+const addPlant = async(data, delivery, next) => {
     const connection = await promisePool.getConnection();
     let firstQueryRows = [];
 
@@ -90,9 +93,10 @@ const addPlant = async(data, delivery) => {
 
         await connection.commit();
     } catch (e) {
-        console.error('addPlant', e.message);
         // If something went wrong, rollback so changes will be deleted
         await connection.rollback();
+        console.error('addPlant', e.message);
+        next(httpError('Database error', 500));
     } finally {
         connection.release();
         return firstQueryRows;
@@ -100,7 +104,7 @@ const addPlant = async(data, delivery) => {
 };
 
 // TODO: users can only update own plants, except admins.
-const updatePlant = async (data, delivery) => {
+const updatePlant = async (data, delivery, next) => {
     const connection = await promisePool.getConnection();
     let firstQueryRows = [];
 
@@ -128,9 +132,10 @@ const updatePlant = async (data, delivery) => {
 
         await connection.commit();
     } catch(e) {
-        console.error('updatePlant', e.message);
         // If something went wrong, rollback so changes will be deleted
         await connection.rollback();
+        console.error('updatePlant', e.message);
+        next(httpError('Database error', 500));
     } finally {
         connection.release();
         return firstQueryRows;
@@ -138,12 +143,13 @@ const updatePlant = async (data, delivery) => {
 };
 
 // TODO: users can only delete own plants, except admins.
-const deletePlant = async (plantId) => {
+const deletePlant = async (plantId, next) => {
     try {
         const [rows] = await promisePool.execute(`DELETE FROM plant WHERE plant_id=?`, [plantId]);
         return rows;
     } catch (e) {
         console.error('deletePlant', e.message);
+        next(httpError('Database error', 500));
     }
 };
 

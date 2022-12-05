@@ -1,38 +1,41 @@
 // userController
 'use strict';
 const {getAllUsers, getUser, addUser, updateUser, deleteUser} = require('../models/userModel');
+const {httpError} = require('../utils/errors');
 
-const user_list_get = async (req, res) => {
+const user_list_get = async (req, res, next) => {
     try {
-        const result = await getAllUsers();
+        const result = await getAllUsers(next);
 
         if (result.length < 1) {
-            console.error('Yhtäkään käyttäjää ei löytynyt.');
+            next(httpError('No users found', 404));
             return;
         }
 
         res.json(result);
     } catch (e) {
         console.error('user_list_get', e.message);
+        next(httpError('Internal server error', 500));
     }
 };
 
-const user_get = async (req, res) => {
+const user_get = async (req, res, next) => {
     try {
-        const result = await getUser(req.params.id);
+        const result = await getUser(req.params.id, next);
 
         if (result.length < 1) {
-            console.error('Käyttäjää ei löytynyt.');
+            next(httpError('No user found', 404));
             return;
         }
 
         res.json(result.pop());
     } catch (e) {
         console.error('user_get', e.message);
+        next(httpError('Internal server error', 500));
     }
 };
 
-const user_post = async (req, res) => {
+const user_post = async (req, res, next) => {
     try {
         const data = [
             req.body.email,
@@ -41,21 +44,24 @@ const user_post = async (req, res) => {
             req.body.municipality
         ];
 
+        const result = await addUser(data, next);
+
         if (result.affectedRows < 1) {
-            console.error('Virheellistä tietoa.');
+            next(httpError('Invalid data', 400));
             return;
         }
 
         res.json({
-            message: 'Käyttäjä lisätty.',
+            message: 'User added.',
             user_id: result.insertId
         });
     } catch (e) {
         console.error('user_post', e.message);
+        next(httpError('Internal server error', 500));
     }
 };
 
-const user_put = async (req, res) => {
+const user_put = async (req, res, next) => {
     try {
         const data = [
             req.body.email,
@@ -65,33 +71,33 @@ const user_put = async (req, res) => {
             req.body.id
         ];
 
-        const result = await updateUser(data);
+        const result = await updateUser(data, next);
 
         if (result.affectedRows < 1) {
-            console.error('Virheellistä tietoa.');
+            next(httpError('No user modified', 400));
             return;
         }
 
-        res.json({message: 'Käyttäjää muokattu.',});
+        res.json({message: 'User updated',});
     } catch (e) {
         console.error('user_put', e.message);
+        next(httpError('Internal server error', 500));
     }
 };
 
-const user_delete = async (req, res) => {
+const user_delete = async (req, res, next) => {
     try {
-        const result = await deleteUser(req.params.id);
-
-        console.log(result);
+        const result = await deleteUser(req.params.id, next);
 
         if (result.affectedRows < 1) {
-            console.error('Käyttäjää ei poistettu.');
+            next(httpError('No user deleted', 400));
             return;
         }
 
-        res.json({message: 'Käyttäjä poistettu.',});
+        res.json({message: 'User deleted',});
     } catch (e) {
         console.error('user_delete', e.message);
+        next(httpError('Internal server error', 500));
     }
 };
 

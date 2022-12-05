@@ -1,13 +1,14 @@
 // plantController
 'use strict';
 const {getAllPlants, getPlant, deletePlant, addPlant, updatePlant}= require('../models/plantModel');
+const {httpError} = require('../utils/errors');
 
-const plant_list_get = async (req, res) => {
+const plant_list_get = async (req, res, next) => {
     try {
-        let result = await getAllPlants();
+        let result = await getAllPlants(next);
 
         if (result.length < 1) {
-            console.error('Yhtäkään pistokasta ei löytynyt.');
+            next(httpError('No plants found', 404));
             return;
         }
 
@@ -38,15 +39,16 @@ const plant_list_get = async (req, res) => {
         res.json(result);
     } catch (e) {
         console.error('plant_list_get', e.message);
+        next(httpError('Internal server error', 500));
     }
 };
 
-const plant_get = async (req, res) => {
+const plant_get = async (req, res, next) => {
     try {
-        let result = await getPlant(req.params.id);
+        let result = await getPlant(req.params.id, next);
 
         if (result.length < 1) {
-            console.error('Pistokasta ei löytynyt.');
+            next(httpError('No plant found', 404));
             return;
         }
 
@@ -77,12 +79,13 @@ const plant_get = async (req, res) => {
         res.json(result.pop());
     } catch (e) {
         console.error('plant_get', e.message);
+        next(httpError('Internal server error', 500));
     }
 };
 
 // TODO: should receive deliverys as an array from front
 // have to change in front side so that the form posts delivery input as array? Maybe? not sure 
-const plant_post = async (req, res) => {
+const plant_post = async (req, res, next) => {
     try {
         const data = [
             req.body.name,
@@ -95,23 +98,24 @@ const plant_post = async (req, res) => {
 
         const delivery = req.body.delivery.split(', ');
 
-        const result = await addPlant(data, delivery);
+        const result = await addPlant(data, delivery, next);
 
         if (result.length < 1) {
-            console.error('Virheellistä tietoa.');
+            next(httpError('Invalid data', 400));
             return;
         }
 
         res.json({
-            message: 'Pistokas lisätty.',
+            message: 'Plant added.',
             plant_id: result[0].insertId,
         });
     } catch (e) {
         console.error('plant_post', e.message);
+        next(httpError('Internal server error', 500));
     }
 };
 
-const plant_put = async (req, res) => {
+const plant_put = async (req, res, next) => {
     try {
         const data = [
             req.body.name,
@@ -129,31 +133,33 @@ const plant_put = async (req, res) => {
             delivery.splice(2, 0, req.body.id);
         }
   
-        const result = await updatePlant(data, delivery);
+        const result = await updatePlant(data, delivery, next);
 
         if (result[0].affectedRows < 1) {
-            console.error('Virheellistä tietoa.');
+            next(httpError('No plant modified', 400));
             return;
         }
   
-        res.json({message: 'Pistokasta muokattu.',});
+        res.json({message: 'Plant updated',});
     } catch (e) {
         console.error('plant_put', e.message);
+        next(httpError('Internal server error', 500));
     }
 };
 
-const plant_delete = async (req, res) => {
+const plant_delete = async (req, res, next) => {
     try {
-        const result = await deletePlant(req.params.id);
+        const result = await deletePlant(req.params.id, next);
   
         if (result.affectedRows < 1) {
-            console.error('Pistokasta ei poistettu.')
+            next(httpError('No plant deleted', 400));
             return;
         }
   
-        res.json({message: 'Pistokas poistettu.',});
+        res.json({message: 'Plant deleted',});
     } catch (e) {
         console.error('plant_delete', e.message);
+        next(httpError('Internal server error', 500));
     }
 };
 

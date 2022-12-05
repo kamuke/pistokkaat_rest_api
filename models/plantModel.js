@@ -6,7 +6,7 @@ const promisePool = pool.promise();
 // TODO: search in this same get?
 const getAllPlants = async () => {
     try {
-        let [rows] = await promisePool.query(`SELECT 		plant.plant_id, 
+        const [rows] = await promisePool.query(`SELECT 		plant.plant_id, 
                                                             plant.name, 
                                                             plant.price, 
                                                             plant.description, 
@@ -36,7 +36,7 @@ const getAllPlants = async () => {
 
 const getPlant = async (plantId) => {
     try {
-        let [rows] = await promisePool.query(`SELECT        plant.plant_id, 
+        const [rows] = await promisePool.query(`SELECT        plant.plant_id, 
                                                             plant.name, 
                                                             plant.price, 
                                                             plant.description, 

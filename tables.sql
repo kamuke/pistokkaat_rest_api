@@ -74,7 +74,7 @@ CREATE TABLE plantdelivery
 	plant_id INT NOT NULL,
 	delivery VARCHAR(60) NOT NULL,
 	PRIMARY KEY (plant_id, delivery),
-	FOREIGN KEY (plant_id) REFERENCES Plant(plant_id),
+	FOREIGN KEY (plant_id) REFERENCES Plant(plant_id) ON DELETE CASCADE ON UPDATE CASCADE,
 	FOREIGN KEY (delivery) REFERENCES delivery(delivery)
 );
 
@@ -444,15 +444,15 @@ VALUES('Aloevera', 2, 'asdsaddasd2sdfe', 'Isosta mehikasvista otettu pistokas.',
 INSERT INTO plant(name, price, imagename, description, instruction, user_id) 
 VALUES('Anopinkieli', 1, 'asdsaddasd2sdfe', 'Vihreäraidallinen anopinkieli, suorat lehdet.', 'Hiekkainen kasvualusta ja kastelu vain tarvittaessa.', 2);
 
-INSERT INTO plantdelivery VALUES(1, 'Nouto');
-INSERT INTO plantdelivery VALUES(1, 'Postitus');
-INSERT INTO plantdelivery VALUES (2, 'Postitus');
-INSERT INTO plantdelivery VALUES (3, 'Nouto');
+INSERT INTO plantdelivery(plant_id, delivery) VALUES(1, 'Nouto');
+INSERT INTO plantdelivery(plant_id, delivery) VALUES(1, 'Postitus');
+INSERT INTO plantdelivery(plant_id, delivery) VALUES (2, 'Postitus');
+INSERT INTO plantdelivery(plant_id, delivery) VALUES (3, 'Nouto');
 
 DROP USER if EXISTS psuser@localhost;
 CREATE USER psuser@localhost IDENTIFIED BY 'peikonlehti';
-GRANT SELECT, INSERT, UPDATE, DELETE ON pistokkaat.* TO 'psuser'@'localhost';
+GRANT SELECT, INSERT, UPDATE, DELETE ON pistokkaat.* TO psuser@localhost;
 
-DROP INDEX if EXISTS idx_plantname;
+/* DROP INDEX if EXISTS idx_plantname; */
 CREATE INDEX idx_plantname
 ON plant(NAME);

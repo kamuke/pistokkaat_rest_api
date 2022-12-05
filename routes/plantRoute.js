@@ -4,25 +4,15 @@ const express = require('express');
 const multer  = require('multer');
 const upload = multer({dest: './uploads/'});
 const router = express.Router();
-const {plant_list_get, plant_get, plant_post} = require('../controllers/plantController');
+const {plant_list_get, plant_get, plant_post, plant_delete, plant_put} = require('../controllers/plantController');
 
-// GET method route
-router.get('/', plant_list_get);
+router.route('/').
+    get(plant_list_get).
+    post(upload.single('image'), plant_post).
+    put(plant_put);
 
-// GET method route
-router.get('/:id', plant_get);
-
-// POST method route
-router.post('/', upload.single('image'), plant_post);
-
-// PUT method route
-router.put('/', (req, res) => {
-    res.send('With this endpoint you can edit plants.');
-});
-
-// DELETE method route
-router.delete('/', (req, res) => {
-    res.send('With this endpoint you can delete plants.');
-});
+router.route('/:id').
+    get(plant_get).
+    delete(plant_delete);
 
 module.exports = router;

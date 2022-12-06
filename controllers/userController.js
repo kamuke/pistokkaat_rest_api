@@ -54,7 +54,7 @@ const user_post = async (req, res, next) => {
         // There are errors in data
         if (!errors.isEmpty()) {
             console.error('user_post validation', errors.array());
-            next(httpError('Invalid data', 400));
+            next(httpError(errors.array()[0].msg, 400));
             return;
         }
 
@@ -90,7 +90,7 @@ const user_put = async (req, res, next) => {
         // There are errors in data
         if (!errors.isEmpty()) {
             console.error('user_put validation', errors.array());
-            next(httpError('Invalid data', 400));
+            next(httpError(errors.array()[0].msg, 400));
             return;
         }
 

@@ -7,14 +7,35 @@ const {user_list_get, user_get, user_post, user_put, user_delete} = require('../
 
 router.route('/').
     get(user_list_get).
-    post(body('email').isEmail().normalizeEmail().isLength({max: 60}),
-        body('username').isLength({min: 3, max: 20}).escape(),
-        body('password').matches(/(?=.*\p{Lu}).{8,}/u).isLength({max: 80}).escape(),
+    post(body('email').
+            isEmail().
+            withMessage('Email must be valid email and maximum of 60 characters.').
+            normalizeEmail().isLength({max: 60}),
+        body('username').
+            isLength({min: 3, max: 20}).
+            withMessage('Username must have minimum of 3 and maximum of 20 characters.').
+            escape(),
+        body('password').
+            matches(/(?=.*\p{Lu}).{8,}/u).
+            withMessage('Password must have minimum of 8 and maximum of 80 characters, and at least one capital character.').
+            isLength({max: 80}).
+            escape(),
         body('municipality').escape(),
         user_post).
-    put(body('email').isEmail().normalizeEmail().isLength({max: 60}),
-        body('username').isLength({min: 3, max: 20}).escape(),
-        body('password').matches(/(?=.*\p{Lu}).{8,}/u).isLength({max: 80}).escape(),
+    put(body('email').
+            isEmail().
+            withMessage('Email must be valid email and maximum of 60 characters.').
+            normalizeEmail().
+            isLength({max: 60}),
+        body('username').
+            isLength({min: 3, max: 20}).
+            withMessage('Username must have minimum of 3 and maximum of 20 characters.').
+            escape(),
+        body('password').
+            matches(/(?=.*\p{Lu}).{8,}/u).
+            withMessage('Password must have minimum of 8 and maximum of 80 characters, and at least one capital character.').
+            isLength({max: 80}).
+            escape(),
         body('municipality').escape(),
         body('id').isInt(),
         user_put);

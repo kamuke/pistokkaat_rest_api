@@ -4,6 +4,8 @@ const express = require('express');
 const cors = require('cors');
 const plantRoute = require('./routes/plantRoute');
 const userRoute = require('./routes/userRoute');
+const deliveryRoute = require('./routes/deliveryRoute');
+const locationRoute = require('./routes/locationRoute');
 const {httpError} = require('./utils/errors');
 const app = express();
 const port = 3000;
@@ -15,6 +17,8 @@ app.use(express.static('uploads'));
 
 app.use('/plant', plantRoute);
 app.use('/user', userRoute);
+app.use('/delivery', deliveryRoute);
+app.use('/location', locationRoute);
 
 app.use((req, res, next) => {
     const err = httpError('Not found', 404);

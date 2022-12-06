@@ -6,7 +6,7 @@ const promisePool = pool.promise();
 
 const getAllUsers = async (next) => {
     try {
-        const [rows] = await promisePool.query(`SELECT user.user_id, user.email, user.username, user.municipality, user.role, COUNT(userlikes.liked) AS likes
+        const [rows] = await promisePool.query(`SELECT user.user_id, user.email, user.username, user.municipality, COUNT(userlikes.liked) AS likes, user.role
                                                 FROM user
                                                 LEFT JOIN userlikes ON user.user_id = userlikes.liked
                                                 GROUP BY user.user_id;`);
@@ -19,7 +19,7 @@ const getAllUsers = async (next) => {
 
 const getUser = async (userId, next) => {
     try {
-        const [rows] = await promisePool.query(`SELECT user.user_id, user.email, user.username, user.municipality, user.role, COUNT(userlikes.liked) AS likes
+        const [rows] = await promisePool.query(`SELECT user.user_id, user.email, user.username, user.municipality, COUNT(userlikes.liked) AS likes, user.role
                                                 FROM user
                                                 LEFT JOIN userlikes ON user.user_id = userlikes.liked
                                                 GROUP BY user.user_id        

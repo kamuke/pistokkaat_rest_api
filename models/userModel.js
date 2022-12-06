@@ -6,8 +6,10 @@ const promisePool = pool.promise();
 
 const getAllUsers = async (next) => {
     try {
-        const [rows] = await promisePool.query(`SELECT user_id, email, username, municipality, role
-                                                FROM user;`);
+        const [rows] = await promisePool.query(`SELECT user.user_id, user.email, user.username, user.municipality, user.role, COUNT(userlikes.liked) AS likes
+                                                FROM user
+                                                LEFT JOIN userlikes ON user.user_id = userlikes.liked
+                                                GROUP BY user.user_id;`);
         return rows;
     } catch (e) {
         console.error('getAllUsers', e.message);
@@ -17,9 +19,11 @@ const getAllUsers = async (next) => {
 
 const getUser = async (userId, next) => {
     try {
-        const [rows] = await promisePool.query(`SELECT user_id, email, username, municipality, role
+        const [rows] = await promisePool.query(`SELECT user.user_id, user.email, user.username, user.municipality, user.role, COUNT(userlikes.liked) AS likes
                                                 FROM user
-                                                WHERE user_id=?;`, [userId]);
+                                                LEFT JOIN userlikes ON user.user_id = userlikes.liked
+                                                GROUP BY user.user_id        
+                                                HAVING user_id=?;`, [userId]);
         return rows;
     } catch (e) {
         console.error('getUser', e.message);

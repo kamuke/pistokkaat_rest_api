@@ -2,6 +2,7 @@
 'use strict';
 const {getAllUsers, getUser, addUser, updateUser, deleteUser} = require('../models/userModel');
 const {httpError} = require('../utils/errors');
+const {validationResult} = require('express-validator');
 
 const user_list_get = async (req, res, next) => {
     try {
@@ -21,6 +22,16 @@ const user_list_get = async (req, res, next) => {
 
 const user_get = async (req, res, next) => {
     try {
+        // Extract the validation errors from a request.
+        const errors = validationResult(req);
+
+        // There are errors in data
+        if (!errors.isEmpty()) {
+            console.error('user_get validation', errors.array());
+            next(httpError('Invalid data', 400));
+            return;
+        }
+
         const result = await getUser(req.params.id, next);
 
         if (result.length < 1) {
@@ -37,6 +48,16 @@ const user_get = async (req, res, next) => {
 
 const user_post = async (req, res, next) => {
     try {
+        // Extract the validation errors from a request.
+        const errors = validationResult(req);
+
+        // There are errors in data
+        if (!errors.isEmpty()) {
+            console.error('user_post validation', errors.array());
+            next(httpError('Invalid data', 400));
+            return;
+        }
+
         const data = [
             req.body.email,
             req.body.username,
@@ -63,6 +84,16 @@ const user_post = async (req, res, next) => {
 
 const user_put = async (req, res, next) => {
     try {
+        // Extract the validation errors from a request.
+        const errors = validationResult(req);
+
+        // There are errors in data
+        if (!errors.isEmpty()) {
+            console.error('user_put validation', errors.array());
+            next(httpError('Invalid data', 400));
+            return;
+        }
+
         const data = [
             req.body.email,
             req.body.username,
@@ -87,6 +118,16 @@ const user_put = async (req, res, next) => {
 
 const user_delete = async (req, res, next) => {
     try {
+        // Extract the validation errors from a request.
+        const errors = validationResult(req);
+
+        // There are errors in data
+        if (!errors.isEmpty()) {
+            console.error('user_delete validation', errors.array());
+            next(httpError('Invalid data', 400));
+            return;
+        }
+
         const result = await deleteUser(req.params.id, next);
 
         if (result.affectedRows < 1) {

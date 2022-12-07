@@ -58,6 +58,20 @@ const user_post = async (req, res, next) => {
             return;
         }
 
+        const users = await getAllUsers(next);
+
+        // Check if email is already in use
+        if (users.find(user => user && user.email === req.body.email)) {
+            next(httpError('Email already in use', 400));
+            return;
+        }
+
+        // Check if username is already in use
+        if (users.find(user => user && user.username === req.body.username)) {
+            next(httpError('Username already in use', 400));
+            return;
+        }
+
         const data = [
             req.body.email,
             req.body.username,
@@ -91,6 +105,20 @@ const user_put = async (req, res, next) => {
         if (!errors.isEmpty()) {
             console.error('user_put validation', errors.array());
             next(httpError(errors.array()[0].msg, 400));
+            return;
+        }
+
+        const users = await getAllUsers(next);
+
+        // Check if email is already in use
+        if (users.find(user => user && user.email === req.body.email && user.user_id !== req.body.id)) {
+            next(httpError('Email already in use', 400));
+            return;
+        }
+
+        // Check if username is already in use
+        if (users.find(user => user && user.username === req.body.username && user.user_id !== req.body.id)) {
+            next(httpError('Username already in use', 400));
             return;
         }
 

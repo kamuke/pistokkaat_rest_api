@@ -1,7 +1,8 @@
 // plantController
 'use strict';
-const {getAllPlants, getPlant, deletePlant, addPlant, updatePlant}= require('../models/plantModel');
+const {getAllPlants, getPlant, deletePlant, addPlant, updatePlant} = require('../models/plantModel');
 const {httpError} = require('../utils/errors');
+const {validationResult} = require('express-validator');
 
 const plant_list_get = async (req, res, next) => {
     try {
@@ -45,6 +46,16 @@ const plant_list_get = async (req, res, next) => {
 
 const plant_get = async (req, res, next) => {
     try {
+        // Extract the validation errors from a request.
+        const errors = validationResult(req);
+
+        // There are errors in data
+        if (!errors.isEmpty()) {
+            console.error('plant_get validation', errors.array());
+            next(httpError('Invalid data', 400));
+            return;
+        }
+
         let result = await getPlant(req.params.id, next);
 
         if (result.length < 1) {
@@ -87,6 +98,16 @@ const plant_get = async (req, res, next) => {
 // have to change in front side so that the form posts delivery input as array? Maybe? not sure 
 const plant_post = async (req, res, next) => {
     try {
+        // Extract the validation errors from a request.
+        const errors = validationResult(req);
+
+        // There are errors in data
+        if (!errors.isEmpty()) {
+            console.error('plant_post validation', errors.array());
+            next(httpError(errors.array()[0].msg, 400));
+            return;
+        }
+
         const data = [
             req.body.name,
             req.body.price,
@@ -117,6 +138,16 @@ const plant_post = async (req, res, next) => {
 
 const plant_put = async (req, res, next) => {
     try {
+        // Extract the validation errors from a request.
+        const errors = validationResult(req);
+
+        // There are errors in data
+        if (!errors.isEmpty()) {
+            console.error('plant_put validation', errors.array());
+            next(httpError(errors.array()[0].msg, 400));
+            return;
+        }
+
         const data = [
             req.body.name,
             req.body.price,
@@ -149,6 +180,16 @@ const plant_put = async (req, res, next) => {
 
 const plant_delete = async (req, res, next) => {
     try {
+        // Extract the validation errors from a request.
+        const errors = validationResult(req);
+
+        // There are errors in data
+        if (!errors.isEmpty()) {
+            console.error('plant_delete validation', errors.array());
+            next(httpError('Invalid data', 400));
+            return;
+        }
+
         const result = await deletePlant(req.params.id, next);
   
         if (result.affectedRows < 1) {

@@ -45,7 +45,7 @@ router.route('/').
             withMessage('Instruction must have minimum of 30 and maximum of 280 characters.').
             escape(),
         body('delivery').escape(),
-        body('seller').isInt(),
+        body('seller_id').isInt(),
         plant_post).
     put(body('name').
             isLength({min: 3, max: 200}).
@@ -62,7 +62,7 @@ router.route('/').
             withMessage('Instruction must have minimum of 30 and maximum of 280 characters.').
             escape(),
         body('delivery').escape(),
-        body('id').isInt(),
+        body('plant_id').isInt(),
         plant_put);
 
 router.route('/:id').

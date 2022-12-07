@@ -6,9 +6,10 @@ const promisePool = pool.promise();
 
 const getAllUsers = async (next) => {
     try {
-        const [rows] = await promisePool.query(`SELECT user.user_id, user.email, user.username, user.municipality, COUNT(userlikes.liked) AS likes, user.role
+        const [rows] = await promisePool.query(`SELECT user.user_id, user.email, user.username, municipality.name as location, COUNT(userlikes.liked_id) AS likes, user.role
                                                 FROM user
-                                                LEFT JOIN userlikes ON user.user_id = userlikes.liked
+                                                INNER JOIN municipality ON user.municipality_id = municipality.municipality_id
+                                                LEFT JOIN userlikes ON user.user_id = userlikes.liked_id
                                                 GROUP BY user.user_id;`);
         return rows;
     } catch (e) {
@@ -19,10 +20,11 @@ const getAllUsers = async (next) => {
 
 const getUser = async (userId, next) => {
     try {
-        const [rows] = await promisePool.query(`SELECT user.user_id, user.email, user.username, user.municipality, COUNT(userlikes.liked) AS likes, user.role
+        const [rows] = await promisePool.query(`SELECT user.user_id, user.email, user.username, municipality.name as location, COUNT(userlikes.liked_id) AS likes, user.role
                                                 FROM user
-                                                LEFT JOIN userlikes ON user.user_id = userlikes.liked
-                                                GROUP BY user.user_id        
+                                                INNER JOIN municipality ON user.municipality_id = municipality.municipality_id
+                                                LEFT JOIN userlikes ON user.user_id = userlikes.liked_id
+                                                GROUP BY user.user_id     
                                                 HAVING user_id=?;`, [userId]);
         return rows;
     } catch (e) {
@@ -33,7 +35,7 @@ const getUser = async (userId, next) => {
 
 const addUser = async (data, next) => {
     try {
-        const [rows] = await promisePool.query(`INSERT INTO user(email, username, password, municipality) 
+        const [rows] = await promisePool.query(`INSERT INTO user(email, username, password, municipality_id) 
                                                 VALUES(?, ?, ?, ?);`, data);
         return rows;
     } catch (e) {
@@ -45,7 +47,7 @@ const addUser = async (data, next) => {
 const updateUser = async (data, next) => {
     try {
         const [rows] = await promisePool.execute(`UPDATE user 
-                                                SET email = ?, username = ?, password = ?, municipality = ? 
+                                                SET email = ?, username = ?, password = ?, municipality_id = ? 
                                                 WHERE user_id = ?;`, data);
         return rows;
     } catch (e) {

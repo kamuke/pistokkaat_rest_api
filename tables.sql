@@ -6,24 +6,27 @@ USE pistokkaat;
 DROP TABLE if EXISTS province;
 CREATE TABLE province
 (
-	province VARCHAR(40) NOT NULL,
-	PRIMARY KEY (province)
+	province_id INT NOT NULL AUTO_INCREMENT,
+	name VARCHAR(40) NOT NULL,
+	PRIMARY KEY (province_id)
 );
 
 DROP TABLE if EXISTS municipality;
 CREATE TABLE municipality
 (
-	municipality VARCHAR(40) NOT NULL,
-	province VARCHAR(40) NOT NULL,
-	PRIMARY KEY (municipality),
-	FOREIGN KEY (province) REFERENCES province(province)
+	municipality_id INT NOT NULL AUTO_INCREMENT,
+	name VARCHAR(40) NOT NULL,
+	province_id INT NOT NULL,
+	PRIMARY KEY (municipality_id),
+	FOREIGN KEY (province_id) REFERENCES province(province_id)
 );
 
 DROP TABLE if EXISTS delivery;
 CREATE TABLE delivery
 (
-	delivery VARCHAR(60) NOT NULL,
-	PRIMARY KEY (delivery)
+	delivery_id INT NOT NULL AUTO_INCREMENT,
+	name VARCHAR(60) NOT NULL,
+	PRIMARY KEY (delivery_id)
 );
 
 DROP TABLE if EXISTS user;
@@ -33,10 +36,10 @@ CREATE TABLE user
 	email VARCHAR(60) NOT NULL,
 	username VARCHAR(20) NOT NULL,
 	password VARCHAR(80) NOT NULL,
-	municipality VARCHAR(40) NOT NULL,
+	municipality_id INT NOT NULL,
 	role INT NOT NULL DEFAULT 1,
 	PRIMARY KEY (user_id),
-	FOREIGN KEY (municipality) REFERENCES municipality(municipality),
+	FOREIGN KEY (municipality_id) REFERENCES municipality(municipality_id),
 	UNIQUE (email),
 	UNIQUE (username)
 );
@@ -44,11 +47,11 @@ CREATE TABLE user
 DROP TABLE if EXISTS userlikes;
 CREATE TABLE userlikes
 (
-	liker INT NOT NULL,
-	liked INT NOT NULL,
-	PRIMARY KEY (liker, liked),
-	FOREIGN KEY (liker) REFERENCES User(user_id),
-	FOREIGN KEY (liked) REFERENCES User(user_id)
+	liker_id INT NOT NULL,
+	liked_id INT NOT NULL,
+	PRIMARY KEY (liker_id, liked_id),
+	FOREIGN KEY (liker_id) REFERENCES User(user_id),
+	FOREIGN KEY (liked_id) REFERENCES User(user_id)
 );
 
 
@@ -65,17 +68,17 @@ CREATE TABLE plant
 	created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	edited TIMESTAMP,
 	PRIMARY KEY (plant_id),
-	FOREIGN KEY (user_id) REFERENCES user(user_id)  ON DELETE CASCADE ON UPDATE CASCADE
+	FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 DROP TABLE if EXISTS plantdelivery;
 CREATE TABLE plantdelivery
 (
 	plant_id INT NOT NULL,
-	delivery VARCHAR(60) NOT NULL,
-	PRIMARY KEY (plant_id, delivery),
-	FOREIGN KEY (plant_id) REFERENCES Plant(plant_id) ON DELETE CASCADE ON UPDATE CASCADE,
-	FOREIGN KEY (delivery) REFERENCES delivery(delivery)
+	delivery_id INT NOT NULL,
+	PRIMARY KEY (plant_id, delivery_id),
+	FOREIGN KEY (plant_id) REFERENCES plant(plant_id) ON DELETE CASCADE ON UPDATE CASCADE,
+	FOREIGN KEY (delivery_id) REFERENCES delivery(delivery_id)
 );
 
 DROP TABLE if EXISTS plantfavourites;
@@ -101,341 +104,341 @@ CREATE TABLE comment
 	FOREIGN KEY (plant_id) REFERENCES plant(plant_id)
 );
 
-INSERT INTO province VALUES('Uusimaa');
-INSERT INTO province VALUES('Varsinais-Suomi');
-INSERT INTO province VALUES('Satakunta');
-INSERT INTO province VALUES('Kanta-Häme');
-INSERT INTO province VALUES('Pirkanmaa');
-INSERT INTO province VALUES('Päijät-Häme');
-INSERT INTO province VALUES('Kymenlaakso');
-INSERT INTO province VALUES('Etelä-Karjala');
-INSERT INTO province VALUES('Etelä-Savo');
-INSERT INTO province VALUES('Pohjois-Savo');
-INSERT INTO province VALUES('Pohjois-Karjala');
-INSERT INTO province VALUES('Keski-Suomi');
-INSERT INTO province VALUES('Etelä-Pohjanmaa');
-INSERT INTO province VALUES('Pohjanmaa');
-INSERT INTO province VALUES('Keski-Pohjanmaa');
-INSERT INTO province VALUES('Pohjois-Pohjanmaa');
-INSERT INTO province VALUES('Kainuu');
-INSERT INTO province VALUES('Lappi');
-INSERT INTO province VALUES('Ahvenanmaa');
+INSERT INTO province(name) VALUES('Uusimaa');
+INSERT INTO province(name) VALUES('Varsinais-Suomi');
+INSERT INTO province(name) VALUES('Satakunta');
+INSERT INTO province(name) VALUES('Kanta-Häme');
+INSERT INTO province(name) VALUES('Pirkanmaa');
+INSERT INTO province(name) VALUES('Päijät-Häme');
+INSERT INTO province(name) VALUES('Kymenlaakso');
+INSERT INTO province(name) VALUES('Etelä-Karjala');
+INSERT INTO province(name) VALUES('Etelä-Savo');
+INSERT INTO province(name) VALUES('Pohjois-Savo');
+INSERT INTO province(name) VALUES('Pohjois-Karjala');
+INSERT INTO province(name) VALUES('Keski-Suomi');
+INSERT INTO province(name) VALUES('Etelä-Pohjanmaa');
+INSERT INTO province(name) VALUES('Pohjanmaa');
+INSERT INTO province(name) VALUES('Keski-Pohjanmaa');
+INSERT INTO province(name) VALUES('Pohjois-Pohjanmaa');
+INSERT INTO province(name) VALUES('Kainuu');
+INSERT INTO province(name) VALUES('Lappi');
+INSERT INTO province(name) VALUES('Ahvenanmaa');
 
-INSERT INTO municipality(municipality,province) VALUES ('Askola','Uusimaa');
-INSERT INTO municipality(municipality,province) VALUES ('Espoo','Uusimaa');
-INSERT INTO municipality(municipality,province) VALUES ('Hanko','Uusimaa');
-INSERT INTO municipality(municipality,province) VALUES ('Helsinki','Uusimaa');
-INSERT INTO municipality(municipality,province) VALUES ('Vantaa','Uusimaa');
-INSERT INTO municipality(municipality,province) VALUES ('Hyvinkää','Uusimaa');
-INSERT INTO municipality(municipality,province) VALUES ('Inkoo','Uusimaa');
-INSERT INTO municipality(municipality,province) VALUES ('Järvenpää','Uusimaa');
-INSERT INTO municipality(municipality,province) VALUES ('Karkkila','Uusimaa');
-INSERT INTO municipality(municipality,province) VALUES ('Kauniainen','Uusimaa');
-INSERT INTO municipality(municipality,province) VALUES ('Kerava','Uusimaa');
-INSERT INTO municipality(municipality,province) VALUES ('Kirkkonummi','Uusimaa');
-INSERT INTO municipality(municipality,province) VALUES ('Lapinjärvi','Uusimaa');
-INSERT INTO municipality(municipality,province) VALUES ('Loviisa','Uusimaa');
-INSERT INTO municipality(municipality,province) VALUES ('Lohja','Uusimaa');
-INSERT INTO municipality(municipality,province) VALUES ('Myrskylä','Uusimaa');
-INSERT INTO municipality(municipality,province) VALUES ('Mäntsälä','Uusimaa');
-INSERT INTO municipality(municipality,province) VALUES ('Nurmijärvi','Uusimaa');
-INSERT INTO municipality(municipality,province) VALUES ('Pornainen','Uusimaa');
-INSERT INTO municipality(municipality,province) VALUES ('Pukkila','Uusimaa');
-INSERT INTO municipality(municipality,province) VALUES ('Porvoo','Uusimaa');
-INSERT INTO municipality(municipality,province) VALUES ('Raasepori','Uusimaa');
-INSERT INTO municipality(municipality,province) VALUES ('Sipoo','Uusimaa');
-INSERT INTO municipality(municipality,province) VALUES ('Siuntio','Uusimaa');
-INSERT INTO municipality(municipality,province) VALUES ('Tuusula','Uusimaa');
-INSERT INTO municipality(municipality,province) VALUES ('Vihti','Uusimaa');
-INSERT INTO municipality(municipality,province) VALUES ('Aura','Varsinais-Suomi');
-INSERT INTO municipality(municipality,province) VALUES ('Kaarina','Varsinais-Suomi');
-INSERT INTO municipality(municipality,province) VALUES ('Koski Tl','Varsinais-Suomi');
-INSERT INTO municipality(municipality,province) VALUES ('Kustavi','Varsinais-Suomi');
-INSERT INTO municipality(municipality,province) VALUES ('Kemiönsaari','Varsinais-Suomi');
-INSERT INTO municipality(municipality,province) VALUES ('Laitila','Varsinais-Suomi');
-INSERT INTO municipality(municipality,province) VALUES ('Lieto','Varsinais-Suomi');
-INSERT INTO municipality(municipality,province) VALUES ('Loimaa','Varsinais-Suomi');
-INSERT INTO municipality(municipality,province) VALUES ('Parainen','Varsinais-Suomi');
-INSERT INTO municipality(municipality,province) VALUES ('Marttila','Varsinais-Suomi');
-INSERT INTO municipality(municipality,province) VALUES ('Masku','Varsinais-Suomi');
-INSERT INTO municipality(municipality,province) VALUES ('Mynämäki','Varsinais-Suomi');
-INSERT INTO municipality(municipality,province) VALUES ('Naantali','Varsinais-Suomi');
-INSERT INTO municipality(municipality,province) VALUES ('Nousiainen','Varsinais-Suomi');
-INSERT INTO municipality(municipality,province) VALUES ('Oripää','Varsinais-Suomi');
-INSERT INTO municipality(municipality,province) VALUES ('Paimio','Varsinais-Suomi');
-INSERT INTO municipality(municipality,province) VALUES ('Pyhäranta','Varsinais-Suomi');
-INSERT INTO municipality(municipality,province) VALUES ('Pöytyä','Varsinais-Suomi');
-INSERT INTO municipality(municipality,province) VALUES ('Raisio','Varsinais-Suomi');
-INSERT INTO municipality(municipality,province) VALUES ('Rusko','Varsinais-Suomi');
-INSERT INTO municipality(municipality,province) VALUES ('Salo','Varsinais-Suomi');
-INSERT INTO municipality(municipality,province) VALUES ('Sauvo','Varsinais-Suomi');
-INSERT INTO municipality(municipality,province) VALUES ('Somero','Varsinais-Suomi');
-INSERT INTO municipality(municipality,province) VALUES ('Taivassalo','Varsinais-Suomi');
-INSERT INTO municipality(municipality,province) VALUES ('Turku','Varsinais-Suomi');
-INSERT INTO municipality(municipality,province) VALUES ('Uusikaupunki','Varsinais-Suomi');
-INSERT INTO municipality(municipality,province) VALUES ('Vehmaa','Varsinais-Suomi');
-INSERT INTO municipality(municipality,province) VALUES ('Eura','Satakunta');
-INSERT INTO municipality(municipality,province) VALUES ('Eurajoki','Satakunta');
-INSERT INTO municipality(municipality,province) VALUES ('Harjavalta','Satakunta');
-INSERT INTO municipality(municipality,province) VALUES ('Huittinen','Satakunta');
-INSERT INTO municipality(municipality,province) VALUES ('Jämijärvi','Satakunta');
-INSERT INTO municipality(municipality,province) VALUES ('Kankaanpää','Satakunta');
-INSERT INTO municipality(municipality,province) VALUES ('Karvia','Satakunta');
-INSERT INTO municipality(municipality,province) VALUES ('Kokemäki','Satakunta');
-INSERT INTO municipality(municipality,province) VALUES ('Merikarvia','Satakunta');
-INSERT INTO municipality(municipality,province) VALUES ('Nakkila','Satakunta');
-INSERT INTO municipality(municipality,province) VALUES ('Pomarkku','Satakunta');
-INSERT INTO municipality(municipality,province) VALUES ('Pori','Satakunta');
-INSERT INTO municipality(municipality,province) VALUES ('Rauma','Satakunta');
-INSERT INTO municipality(municipality,province) VALUES ('Siikainen','Satakunta');
-INSERT INTO municipality(municipality,province) VALUES ('Säkylä','Satakunta');
-INSERT INTO municipality(municipality,province) VALUES ('Ulvila','Satakunta');
-INSERT INTO municipality(municipality,province) VALUES ('Forssa','Kanta-Häme');
-INSERT INTO municipality(municipality,province) VALUES ('Hattula','Kanta-Häme');
-INSERT INTO municipality(municipality,province) VALUES ('Hausjärvi','Kanta-Häme');
-INSERT INTO municipality(municipality,province) VALUES ('Humppila','Kanta-Häme');
-INSERT INTO municipality(municipality,province) VALUES ('Hämeenlinna','Kanta-Häme');
-INSERT INTO municipality(municipality,province) VALUES ('Janakkala','Kanta-Häme');
-INSERT INTO municipality(municipality,province) VALUES ('Jokioinen','Kanta-Häme');
-INSERT INTO municipality(municipality,province) VALUES ('Loppi','Kanta-Häme');
-INSERT INTO municipality(municipality,province) VALUES ('Riihimäki','Kanta-Häme');
-INSERT INTO municipality(municipality,province) VALUES ('Tammela','Kanta-Häme');
-INSERT INTO municipality(municipality,province) VALUES ('Ypäjä','Kanta-Häme');
-INSERT INTO municipality(municipality,province) VALUES ('Akaa','Pirkanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Hämeenkyrö','Pirkanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Ikaalinen','Pirkanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Juupajoki','Pirkanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Kangasala','Pirkanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Kihniö','Pirkanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Kuhmoinen','Pirkanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Lempäälä','Pirkanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Mänttä-Vilppula','Pirkanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Nokia','Pirkanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Orivesi','Pirkanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Parkano','Pirkanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Pirkkala','Pirkanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Punkalaidun','Pirkanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Pälkäne','Pirkanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Ruovesi','Pirkanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Sastamala','Pirkanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Tampere','Pirkanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Urjala','Pirkanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Valkeakoski','Pirkanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Vesilahti','Pirkanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Virrat','Pirkanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Ylöjärvi','Pirkanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Asikkala','Päijät-Häme');
-INSERT INTO municipality(municipality,province) VALUES ('Hartola','Päijät-Häme');
-INSERT INTO municipality(municipality,province) VALUES ('Hollola','Päijät-Häme');
-INSERT INTO municipality(municipality,province) VALUES ('Heinola','Päijät-Häme');
-INSERT INTO municipality(municipality,province) VALUES ('Iitti','Päijät-Häme');
-INSERT INTO municipality(municipality,province) VALUES ('Kärkölä','Päijät-Häme');
-INSERT INTO municipality(municipality,province) VALUES ('Lahti','Päijät-Häme');
-INSERT INTO municipality(municipality,province) VALUES ('Orimattila','Päijät-Häme');
-INSERT INTO municipality(municipality,province) VALUES ('Padasjoki','Päijät-Häme');
-INSERT INTO municipality(municipality,province) VALUES ('Sysmä','Päijät-Häme');
-INSERT INTO municipality(municipality,province) VALUES ('Hamina','Kymenlaakso');
-INSERT INTO municipality(municipality,province) VALUES ('Kotka','Kymenlaakso');
-INSERT INTO municipality(municipality,province) VALUES ('Kouvola','Kymenlaakso');
-INSERT INTO municipality(municipality,province) VALUES ('Miehikkälä','Kymenlaakso');
-INSERT INTO municipality(municipality,province) VALUES ('Pyhtää','Kymenlaakso');
-INSERT INTO municipality(municipality,province) VALUES ('Virolahti','Kymenlaakso');
-INSERT INTO municipality(municipality,province) VALUES ('Imatra','Etelä-Karjala');
-INSERT INTO municipality(municipality,province) VALUES ('Lappeenranta','Etelä-Karjala');
-INSERT INTO municipality(municipality,province) VALUES ('Lemi','Etelä-Karjala');
-INSERT INTO municipality(municipality,province) VALUES ('Luumäki','Etelä-Karjala');
-INSERT INTO municipality(municipality,province) VALUES ('Parikkala','Etelä-Karjala');
-INSERT INTO municipality(municipality,province) VALUES ('Rautjärvi','Etelä-Karjala');
-INSERT INTO municipality(municipality,province) VALUES ('Ruokolahti','Etelä-Karjala');
-INSERT INTO municipality(municipality,province) VALUES ('Savitaipale','Etelä-Karjala');
-INSERT INTO municipality(municipality,province) VALUES ('Taipalsaari','Etelä-Karjala');
-INSERT INTO municipality(municipality,province) VALUES ('Enonkoski','Etelä-Savo');
-INSERT INTO municipality(municipality,province) VALUES ('Hirvensalmi','Etelä-Savo');
-INSERT INTO municipality(municipality,province) VALUES ('Juva','Etelä-Savo');
-INSERT INTO municipality(municipality,province) VALUES ('Kangasniemi','Etelä-Savo');
-INSERT INTO municipality(municipality,province) VALUES ('Mikkeli','Etelä-Savo');
-INSERT INTO municipality(municipality,province) VALUES ('Mäntyharju','Etelä-Savo');
-INSERT INTO municipality(municipality,province) VALUES ('Pertunmaa','Etelä-Savo');
-INSERT INTO municipality(municipality,province) VALUES ('Pieksämäki','Etelä-Savo');
-INSERT INTO municipality(municipality,province) VALUES ('Puumala','Etelä-Savo');
-INSERT INTO municipality(municipality,province) VALUES ('Rantasalmi','Etelä-Savo');
-INSERT INTO municipality(municipality,province) VALUES ('Savonlinna','Etelä-Savo');
-INSERT INTO municipality(municipality,province) VALUES ('Sulkava','Etelä-Savo');
-INSERT INTO municipality(municipality,province) VALUES ('Iisalmi','Pohjois-Savo');
-INSERT INTO municipality(municipality,province) VALUES ('Joroinen','Pohjois-Savo');
-INSERT INTO municipality(municipality,province) VALUES ('Kaavi','Pohjois-Savo');
-INSERT INTO municipality(municipality,province) VALUES ('Keitele','Pohjois-Savo');
-INSERT INTO municipality(municipality,province) VALUES ('Kiuruvesi','Pohjois-Savo');
-INSERT INTO municipality(municipality,province) VALUES ('Kuopio','Pohjois-Savo');
-INSERT INTO municipality(municipality,province) VALUES ('Lapinlahti','Pohjois-Savo');
-INSERT INTO municipality(municipality,province) VALUES ('Leppävirta','Pohjois-Savo');
-INSERT INTO municipality(municipality,province) VALUES ('Pielavesi','Pohjois-Savo');
-INSERT INTO municipality(municipality,province) VALUES ('Rautalampi','Pohjois-Savo');
-INSERT INTO municipality(municipality,province) VALUES ('Rautavaara','Pohjois-Savo');
-INSERT INTO municipality(municipality,province) VALUES ('Siilinjärvi','Pohjois-Savo');
-INSERT INTO municipality(municipality,province) VALUES ('Sonkajärvi','Pohjois-Savo');
-INSERT INTO municipality(municipality,province) VALUES ('Suonenjoki','Pohjois-Savo');
-INSERT INTO municipality(municipality,province) VALUES ('Tervo','Pohjois-Savo');
-INSERT INTO municipality(municipality,province) VALUES ('Tuusniemi','Pohjois-Savo');
-INSERT INTO municipality(municipality,province) VALUES ('Varkaus','Pohjois-Savo');
-INSERT INTO municipality(municipality,province) VALUES ('Vesanto','Pohjois-Savo');
-INSERT INTO municipality(municipality,province) VALUES ('Vieremä','Pohjois-Savo');
-INSERT INTO municipality(municipality,province) VALUES ('Heinävesi','Pohjois-Karjala');
-INSERT INTO municipality(municipality,province) VALUES ('Ilomantsi','Pohjois-Karjala');
-INSERT INTO municipality(municipality,province) VALUES ('Joensuu','Pohjois-Karjala');
-INSERT INTO municipality(municipality,province) VALUES ('Juuka','Pohjois-Karjala');
-INSERT INTO municipality(municipality,province) VALUES ('Kitee','Pohjois-Karjala');
-INSERT INTO municipality(municipality,province) VALUES ('Kontiolahti','Pohjois-Karjala');
-INSERT INTO municipality(municipality,province) VALUES ('Outokumpu','Pohjois-Karjala');
-INSERT INTO municipality(municipality,province) VALUES ('Lieksa','Pohjois-Karjala');
-INSERT INTO municipality(municipality,province) VALUES ('Liperi','Pohjois-Karjala');
-INSERT INTO municipality(municipality,province) VALUES ('Nurmes','Pohjois-Karjala');
-INSERT INTO municipality(municipality,province) VALUES ('Polvijärvi','Pohjois-Karjala');
-INSERT INTO municipality(municipality,province) VALUES ('Rääkkylä','Pohjois-Karjala');
-INSERT INTO municipality(municipality,province) VALUES ('Tohmajärvi','Pohjois-Karjala');
-INSERT INTO municipality(municipality,province) VALUES ('Hankasalmi','Keski-Suomi');
-INSERT INTO municipality(municipality,province) VALUES ('Joutsa','Keski-Suomi');
-INSERT INTO municipality(municipality,province) VALUES ('Jyväskylä','Keski-Suomi');
-INSERT INTO municipality(municipality,province) VALUES ('Jämsä','Keski-Suomi');
-INSERT INTO municipality(municipality,province) VALUES ('Kannonkoski','Keski-Suomi');
-INSERT INTO municipality(municipality,province) VALUES ('Karstula','Keski-Suomi');
-INSERT INTO municipality(municipality,province) VALUES ('Keuruu','Keski-Suomi');
-INSERT INTO municipality(municipality,province) VALUES ('Kinnula','Keski-Suomi');
-INSERT INTO municipality(municipality,province) VALUES ('Kivijärvi','Keski-Suomi');
-INSERT INTO municipality(municipality,province) VALUES ('Konnevesi','Keski-Suomi');
-INSERT INTO municipality(municipality,province) VALUES ('Kyyjärvi','Keski-Suomi');
-INSERT INTO municipality(municipality,province) VALUES ('Laukaa','Keski-Suomi');
-INSERT INTO municipality(municipality,province) VALUES ('Luhanka','Keski-Suomi');
-INSERT INTO municipality(municipality,province) VALUES ('Multia','Keski-Suomi');
-INSERT INTO municipality(municipality,province) VALUES ('Muurame','Keski-Suomi');
-INSERT INTO municipality(municipality,province) VALUES ('Petäjävesi','Keski-Suomi');
-INSERT INTO municipality(municipality,province) VALUES ('Pihtipudas','Keski-Suomi');
-INSERT INTO municipality(municipality,province) VALUES ('Saarijärvi','Keski-Suomi');
-INSERT INTO municipality(municipality,province) VALUES ('Toivakka','Keski-Suomi');
-INSERT INTO municipality(municipality,province) VALUES ('Uurainen','Keski-Suomi');
-INSERT INTO municipality(municipality,province) VALUES ('Viitasaari','Keski-Suomi');
-INSERT INTO municipality(municipality,province) VALUES ('Äänekoski','Keski-Suomi');
-INSERT INTO municipality(municipality,province) VALUES ('Alajärvi','Etelä-Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Alavus','Etelä-Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Evijärvi','Etelä-Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Ilmajoki','Etelä-Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Isojoki','Etelä-Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Isokyrö','Etelä-Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Karijoki','Etelä-Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Kauhajoki','Etelä-Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Kauhava','Etelä-Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Kuortane','Etelä-Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Kurikka','Etelä-Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Lappajärvi','Etelä-Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Lapua','Etelä-Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Seinäjoki','Etelä-Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Soini','Etelä-Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Teuva','Etelä-Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Vimpeli','Etelä-Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Ähtäri','Etelä-Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Kaskinen','Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Korsnäs','Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Kristiinankaupunki','Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Kruunupyy','Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Laihia','Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Luoto','Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Maalahti','Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Mustasaari','Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Närpiö','Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Pietarsaari','Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Pedersören kunta','Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Uusikaarlepyy','Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Vaasa','Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Vöyri','Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Halsua','Keski-Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Kannus','Keski-Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Kaustinen','Keski-Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Kokkola','Keski-Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Lestijärvi','Keski-Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Perho','Keski-Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Toholampi','Keski-Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Veteli','Keski-Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Alavieska','Pohjois-Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Haapajärvi','Pohjois-Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Haapavesi','Pohjois-Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Hailuoto','Pohjois-Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Ii','Pohjois-Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Kalajoki','Pohjois-Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Kempele','Pohjois-Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Kuusamo','Pohjois-Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Kärsämäki','Pohjois-Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Liminka','Pohjois-Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Lumijoki','Pohjois-Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Merijärvi','Pohjois-Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Muhos','Pohjois-Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Nivala','Pohjois-Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Oulainen','Pohjois-Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Oulu','Pohjois-Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Pudasjärvi','Pohjois-Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Pyhäjoki','Pohjois-Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Pyhäjärvi','Pohjois-Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Pyhäntä','Pohjois-Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Raahe','Pohjois-Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Reisjärvi','Pohjois-Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Sievi','Pohjois-Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Siikajoki','Pohjois-Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Vaala','Pohjois-Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Siikalatva','Pohjois-Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Taivalkoski','Pohjois-Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Tyrnävä','Pohjois-Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Utajärvi','Pohjois-Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Ylivieska','Pohjois-Pohjanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Hyrynsalmi','Kainuu');
-INSERT INTO municipality(municipality,province) VALUES ('Kajaani','Kainuu');
-INSERT INTO municipality(municipality,province) VALUES ('Kuhmo','Kainuu');
-INSERT INTO municipality(municipality,province) VALUES ('Paltamo','Kainuu');
-INSERT INTO municipality(municipality,province) VALUES ('Puolanka','Kainuu');
-INSERT INTO municipality(municipality,province) VALUES ('Ristijärvi','Kainuu');
-INSERT INTO municipality(municipality,province) VALUES ('Sotkamo','Kainuu');
-INSERT INTO municipality(municipality,province) VALUES ('Suomussalmi','Kainuu');
-INSERT INTO municipality(municipality,province) VALUES ('Enontekiö','Lappi');
-INSERT INTO municipality(municipality,province) VALUES ('Inari','Lappi');
-INSERT INTO municipality(municipality,province) VALUES ('Kemi','Lappi');
-INSERT INTO municipality(municipality,province) VALUES ('Keminmaa','Lappi');
-INSERT INTO municipality(municipality,province) VALUES ('Kittilä','Lappi');
-INSERT INTO municipality(municipality,province) VALUES ('Kolari','Lappi');
-INSERT INTO municipality(municipality,province) VALUES ('Kemijärvi','Lappi');
-INSERT INTO municipality(municipality,province) VALUES ('Muonio','Lappi');
-INSERT INTO municipality(municipality,province) VALUES ('Pelkosenniemi','Lappi');
-INSERT INTO municipality(municipality,province) VALUES ('Posio','Lappi');
-INSERT INTO municipality(municipality,province) VALUES ('Ranua','Lappi');
-INSERT INTO municipality(municipality,province) VALUES ('Rovaniemi','Lappi');
-INSERT INTO municipality(municipality,province) VALUES ('Salla','Lappi');
-INSERT INTO municipality(municipality,province) VALUES ('Savukoski','Lappi');
-INSERT INTO municipality(municipality,province) VALUES ('Simo','Lappi');
-INSERT INTO municipality(municipality,province) VALUES ('Sodankylä','Lappi');
-INSERT INTO municipality(municipality,province) VALUES ('Tervola','Lappi');
-INSERT INTO municipality(municipality,province) VALUES ('Tornio','Lappi');
-INSERT INTO municipality(municipality,province) VALUES ('Pello','Lappi');
-INSERT INTO municipality(municipality,province) VALUES ('Utsjoki','Lappi');
-INSERT INTO municipality(municipality,province) VALUES ('Ylitornio','Lappi');
-INSERT INTO municipality(municipality,province) VALUES ('Brändö','Ahvenanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Eckerö','Ahvenanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Finström','Ahvenanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Föglö','Ahvenanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Geta','Ahvenanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Hammarland','Ahvenanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Jomala','Ahvenanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Kumlinge','Ahvenanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Kökar','Ahvenanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Lemland','Ahvenanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Lumparland','Ahvenanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Maarianhamina','Ahvenanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Saltvik','Ahvenanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Sottunga','Ahvenanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Sund','Ahvenanmaa');
-INSERT INTO municipality(municipality,province) VALUES ('Vårdö','Ahvenanmaa');
+INSERT INTO municipality(name,province_id) VALUES ('Askola',1);
+INSERT INTO municipality(name,province_id) VALUES ('Espoo',1);
+INSERT INTO municipality(name,province_id) VALUES ('Hanko',1);
+INSERT INTO municipality(name,province_id) VALUES ('Helsinki',1);
+INSERT INTO municipality(name,province_id) VALUES ('Vantaa',1);
+INSERT INTO municipality(name,province_id) VALUES ('Hyvinkää',1);
+INSERT INTO municipality(name,province_id) VALUES ('Inkoo',1);
+INSERT INTO municipality(name,province_id) VALUES ('Järvenpää',1);
+INSERT INTO municipality(name,province_id) VALUES ('Karkkila',1);
+INSERT INTO municipality(name,province_id) VALUES ('Kauniainen',1);
+INSERT INTO municipality(name,province_id) VALUES ('Kerava',1);
+INSERT INTO municipality(name,province_id) VALUES ('Kirkkonummi',1);
+INSERT INTO municipality(name,province_id) VALUES ('Lapinjärvi',1);
+INSERT INTO municipality(name,province_id) VALUES ('Loviisa',1);
+INSERT INTO municipality(name,province_id) VALUES ('Lohja',1);
+INSERT INTO municipality(name,province_id) VALUES ('Myrskylä',1);
+INSERT INTO municipality(name,province_id) VALUES ('Mäntsälä',1);
+INSERT INTO municipality(name,province_id) VALUES ('Nurmijärvi',1);
+INSERT INTO municipality(name,province_id) VALUES ('Pornainen',1);
+INSERT INTO municipality(name,province_id) VALUES ('Pukkila',1);
+INSERT INTO municipality(name,province_id) VALUES ('Porvoo',1);
+INSERT INTO municipality(name,province_id) VALUES ('Raasepori',1);
+INSERT INTO municipality(name,province_id) VALUES ('Sipoo',1);
+INSERT INTO municipality(name,province_id) VALUES ('Siuntio',1);
+INSERT INTO municipality(name,province_id) VALUES ('Tuusula',1);
+INSERT INTO municipality(name,province_id) VALUES ('Vihti',1);
+INSERT INTO municipality(name,province_id) VALUES ('Aura',2);
+INSERT INTO municipality(name,province_id) VALUES ('Kaarina',2);
+INSERT INTO municipality(name,province_id) VALUES ('Koski Tl',2);
+INSERT INTO municipality(name,province_id) VALUES ('Kustavi',2);
+INSERT INTO municipality(name,province_id) VALUES ('Kemiönsaari',2);
+INSERT INTO municipality(name,province_id) VALUES ('Laitila',2);
+INSERT INTO municipality(name,province_id) VALUES ('Lieto',2);
+INSERT INTO municipality(name,province_id) VALUES ('Loimaa',2);
+INSERT INTO municipality(name,province_id) VALUES ('Parainen',2);
+INSERT INTO municipality(name,province_id) VALUES ('Marttila',2);
+INSERT INTO municipality(name,province_id) VALUES ('Masku',2);
+INSERT INTO municipality(name,province_id) VALUES ('Mynämäki',2);
+INSERT INTO municipality(name,province_id) VALUES ('Naantali',2);
+INSERT INTO municipality(name,province_id) VALUES ('Nousiainen',2);
+INSERT INTO municipality(name,province_id) VALUES ('Oripää',2);
+INSERT INTO municipality(name,province_id) VALUES ('Paimio',2);
+INSERT INTO municipality(name,province_id) VALUES ('Pyhäranta',2);
+INSERT INTO municipality(name,province_id) VALUES ('Pöytyä',2);
+INSERT INTO municipality(name,province_id) VALUES ('Raisio',2);
+INSERT INTO municipality(name,province_id) VALUES ('Rusko',2);
+INSERT INTO municipality(name,province_id) VALUES ('Salo',2);
+INSERT INTO municipality(name,province_id) VALUES ('Sauvo',2);
+INSERT INTO municipality(name,province_id) VALUES ('Somero',2);
+INSERT INTO municipality(name,province_id) VALUES ('Taivassalo',2);
+INSERT INTO municipality(name,province_id) VALUES ('Turku',2);
+INSERT INTO municipality(name,province_id) VALUES ('Uusikaupunki',2);
+INSERT INTO municipality(name,province_id) VALUES ('Vehmaa',2);
+INSERT INTO municipality(name,province_id) VALUES ('Eura',3);
+INSERT INTO municipality(name,province_id) VALUES ('Eurajoki',3);
+INSERT INTO municipality(name,province_id) VALUES ('Harjavalta',3);
+INSERT INTO municipality(name,province_id) VALUES ('Huittinen',3);
+INSERT INTO municipality(name,province_id) VALUES ('Jämijärvi',3);
+INSERT INTO municipality(name,province_id) VALUES ('Kankaanpää',3);
+INSERT INTO municipality(name,province_id) VALUES ('Karvia',3);
+INSERT INTO municipality(name,province_id) VALUES ('Kokemäki',3);
+INSERT INTO municipality(name,province_id) VALUES ('Merikarvia',3);
+INSERT INTO municipality(name,province_id) VALUES ('Nakkila',3);
+INSERT INTO municipality(name,province_id) VALUES ('Pomarkku',3);
+INSERT INTO municipality(name,province_id) VALUES ('Pori',3);
+INSERT INTO municipality(name,province_id) VALUES ('Rauma',3);
+INSERT INTO municipality(name,province_id) VALUES ('Siikainen',3);
+INSERT INTO municipality(name,province_id) VALUES ('Säkylä',3);
+INSERT INTO municipality(name,province_id) VALUES ('Ulvila',3);
+INSERT INTO municipality(name,province_id) VALUES ('Forssa',4);
+INSERT INTO municipality(name,province_id) VALUES ('Hattula',4);
+INSERT INTO municipality(name,province_id) VALUES ('Hausjärvi',4);
+INSERT INTO municipality(name,province_id) VALUES ('Humppila',4);
+INSERT INTO municipality(name,province_id) VALUES ('Hämeenlinna',4);
+INSERT INTO municipality(name,province_id) VALUES ('Janakkala',4);
+INSERT INTO municipality(name,province_id) VALUES ('Jokioinen',4);
+INSERT INTO municipality(name,province_id) VALUES ('Loppi',4);
+INSERT INTO municipality(name,province_id) VALUES ('Riihimäki',4);
+INSERT INTO municipality(name,province_id) VALUES ('Tammela',4);
+INSERT INTO municipality(name,province_id) VALUES ('Ypäjä',4);
+INSERT INTO municipality(name,province_id) VALUES ('Akaa',5);
+INSERT INTO municipality(name,province_id) VALUES ('Hämeenkyrö',5);
+INSERT INTO municipality(name,province_id) VALUES ('Ikaalinen',5);
+INSERT INTO municipality(name,province_id) VALUES ('Juupajoki',5);
+INSERT INTO municipality(name,province_id) VALUES ('Kangasala',5);
+INSERT INTO municipality(name,province_id) VALUES ('Kihniö',5);
+INSERT INTO municipality(name,province_id) VALUES ('Kuhmoinen',5);
+INSERT INTO municipality(name,province_id) VALUES ('Lempäälä',5);
+INSERT INTO municipality(name,province_id) VALUES ('Mänttä-Vilppula',5);
+INSERT INTO municipality(name,province_id) VALUES ('Nokia',5);
+INSERT INTO municipality(name,province_id) VALUES ('Orivesi',5);
+INSERT INTO municipality(name,province_id) VALUES ('Parkano',5);
+INSERT INTO municipality(name,province_id) VALUES ('Pirkkala',5);
+INSERT INTO municipality(name,province_id) VALUES ('Punkalaidun',5);
+INSERT INTO municipality(name,province_id) VALUES ('Pälkäne',5);
+INSERT INTO municipality(name,province_id) VALUES ('Ruovesi',5);
+INSERT INTO municipality(name,province_id) VALUES ('Sastamala',5);
+INSERT INTO municipality(name,province_id) VALUES ('Tampere',5);
+INSERT INTO municipality(name,province_id) VALUES ('Urjala',5);
+INSERT INTO municipality(name,province_id) VALUES ('Valkeakoski',5);
+INSERT INTO municipality(name,province_id) VALUES ('Vesilahti',5);
+INSERT INTO municipality(name,province_id) VALUES ('Virrat',5);
+INSERT INTO municipality(name,province_id) VALUES ('Ylöjärvi',5);
+INSERT INTO municipality(name,province_id) VALUES ('Asikkala',6);
+INSERT INTO municipality(name,province_id) VALUES ('Hartola',6);
+INSERT INTO municipality(name,province_id) VALUES ('Hollola',6);
+INSERT INTO municipality(name,province_id) VALUES ('Heinola',6);
+INSERT INTO municipality(name,province_id) VALUES ('Iitti',6);
+INSERT INTO municipality(name,province_id) VALUES ('Kärkölä',6);
+INSERT INTO municipality(name,province_id) VALUES ('Lahti',6);
+INSERT INTO municipality(name,province_id) VALUES ('Orimattila',6);
+INSERT INTO municipality(name,province_id) VALUES ('Padasjoki',6);
+INSERT INTO municipality(name,province_id) VALUES ('Sysmä',6);
+INSERT INTO municipality(name,province_id) VALUES ('Hamina',7);
+INSERT INTO municipality(name,province_id) VALUES ('Kotka',7);
+INSERT INTO municipality(name,province_id) VALUES ('Kouvola',7);
+INSERT INTO municipality(name,province_id) VALUES ('Miehikkälä',7);
+INSERT INTO municipality(name,province_id) VALUES ('Pyhtää',7);
+INSERT INTO municipality(name,province_id) VALUES ('Virolahti',7);
+INSERT INTO municipality(name,province_id) VALUES ('Imatra',8);
+INSERT INTO municipality(name,province_id) VALUES ('Lappeenranta',8);
+INSERT INTO municipality(name,province_id) VALUES ('Lemi',8);
+INSERT INTO municipality(name,province_id) VALUES ('Luumäki',8);
+INSERT INTO municipality(name,province_id) VALUES ('Parikkala',8);
+INSERT INTO municipality(name,province_id) VALUES ('Rautjärvi',8);
+INSERT INTO municipality(name,province_id) VALUES ('Ruokolahti',8);
+INSERT INTO municipality(name,province_id) VALUES ('Savitaipale',8);
+INSERT INTO municipality(name,province_id) VALUES ('Taipalsaari',8);
+INSERT INTO municipality(name,province_id) VALUES ('Enonkoski',9);
+INSERT INTO municipality(name,province_id) VALUES ('Hirvensalmi',9);
+INSERT INTO municipality(name,province_id) VALUES ('Juva',9);
+INSERT INTO municipality(name,province_id) VALUES ('Kangasniemi',9);
+INSERT INTO municipality(name,province_id) VALUES ('Mikkeli',9);
+INSERT INTO municipality(name,province_id) VALUES ('Mäntyharju',9);
+INSERT INTO municipality(name,province_id) VALUES ('Pertunmaa',9);
+INSERT INTO municipality(name,province_id) VALUES ('Pieksämäki',9);
+INSERT INTO municipality(name,province_id) VALUES ('Puumala',9);
+INSERT INTO municipality(name,province_id) VALUES ('Rantasalmi',9);
+INSERT INTO municipality(name,province_id) VALUES ('Savonlinna',9);
+INSERT INTO municipality(name,province_id) VALUES ('Sulkava',9);
+INSERT INTO municipality(name,province_id) VALUES ('Iisalmi',10);
+INSERT INTO municipality(name,province_id) VALUES ('Joroinen',10);
+INSERT INTO municipality(name,province_id) VALUES ('Kaavi',10);
+INSERT INTO municipality(name,province_id) VALUES ('Keitele',10);
+INSERT INTO municipality(name,province_id) VALUES ('Kiuruvesi',10);
+INSERT INTO municipality(name,province_id) VALUES ('Kuopio',10);
+INSERT INTO municipality(name,province_id) VALUES ('Lapinlahti',10);
+INSERT INTO municipality(name,province_id) VALUES ('Leppävirta',10);
+INSERT INTO municipality(name,province_id) VALUES ('Pielavesi',10);
+INSERT INTO municipality(name,province_id) VALUES ('Rautalampi',10);
+INSERT INTO municipality(name,province_id) VALUES ('Rautavaara',10);
+INSERT INTO municipality(name,province_id) VALUES ('Siilinjärvi',10);
+INSERT INTO municipality(name,province_id) VALUES ('Sonkajärvi',10);
+INSERT INTO municipality(name,province_id) VALUES ('Suonenjoki',10);
+INSERT INTO municipality(name,province_id) VALUES ('Tervo',10);
+INSERT INTO municipality(name,province_id) VALUES ('Tuusniemi',10);
+INSERT INTO municipality(name,province_id) VALUES ('Varkaus',10);
+INSERT INTO municipality(name,province_id) VALUES ('Vesanto',10);
+INSERT INTO municipality(name,province_id) VALUES ('Vieremä',10);
+INSERT INTO municipality(name,province_id) VALUES ('Heinävesi',11);
+INSERT INTO municipality(name,province_id) VALUES ('Ilomantsi',11);
+INSERT INTO municipality(name,province_id) VALUES ('Joensuu',11);
+INSERT INTO municipality(name,province_id) VALUES ('Juuka',11);
+INSERT INTO municipality(name,province_id) VALUES ('Kitee',11);
+INSERT INTO municipality(name,province_id) VALUES ('Kontiolahti',11);
+INSERT INTO municipality(name,province_id) VALUES ('Outokumpu',11);
+INSERT INTO municipality(name,province_id) VALUES ('Lieksa',11);
+INSERT INTO municipality(name,province_id) VALUES ('Liperi',11);
+INSERT INTO municipality(name,province_id) VALUES ('Nurmes',11);
+INSERT INTO municipality(name,province_id) VALUES ('Polvijärvi',11);
+INSERT INTO municipality(name,province_id) VALUES ('Rääkkylä',11);
+INSERT INTO municipality(name,province_id) VALUES ('Tohmajärvi',11);
+INSERT INTO municipality(name,province_id) VALUES ('Hankasalmi',12);
+INSERT INTO municipality(name,province_id) VALUES ('Joutsa',12);
+INSERT INTO municipality(name,province_id) VALUES ('Jyväskylä',12);
+INSERT INTO municipality(name,province_id) VALUES ('Jämsä',12);
+INSERT INTO municipality(name,province_id) VALUES ('Kannonkoski',12);
+INSERT INTO municipality(name,province_id) VALUES ('Karstula',12);
+INSERT INTO municipality(name,province_id) VALUES ('Keuruu',12);
+INSERT INTO municipality(name,province_id) VALUES ('Kinnula',12);
+INSERT INTO municipality(name,province_id) VALUES ('Kivijärvi',12);
+INSERT INTO municipality(name,province_id) VALUES ('Konnevesi',12);
+INSERT INTO municipality(name,province_id) VALUES ('Kyyjärvi',12);
+INSERT INTO municipality(name,province_id) VALUES ('Laukaa',12);
+INSERT INTO municipality(name,province_id) VALUES ('Luhanka',12);
+INSERT INTO municipality(name,province_id) VALUES ('Multia',12);
+INSERT INTO municipality(name,province_id) VALUES ('Muurame',12);
+INSERT INTO municipality(name,province_id) VALUES ('Petäjävesi',12);
+INSERT INTO municipality(name,province_id) VALUES ('Pihtipudas',12);
+INSERT INTO municipality(name,province_id) VALUES ('Saarijärvi',12);
+INSERT INTO municipality(name,province_id) VALUES ('Toivakka',12);
+INSERT INTO municipality(name,province_id) VALUES ('Uurainen',12);
+INSERT INTO municipality(name,province_id) VALUES ('Viitasaari',12);
+INSERT INTO municipality(name,province_id) VALUES ('Äänekoski',12);
+INSERT INTO municipality(name,province_id) VALUES ('Alajärvi',13);
+INSERT INTO municipality(name,province_id) VALUES ('Alavus',13);
+INSERT INTO municipality(name,province_id) VALUES ('Evijärvi',13);
+INSERT INTO municipality(name,province_id) VALUES ('Ilmajoki',13);
+INSERT INTO municipality(name,province_id) VALUES ('Isojoki',13);
+INSERT INTO municipality(name,province_id) VALUES ('Isokyrö',13);
+INSERT INTO municipality(name,province_id) VALUES ('Karijoki',13);
+INSERT INTO municipality(name,province_id) VALUES ('Kauhajoki',13);
+INSERT INTO municipality(name,province_id) VALUES ('Kauhava',13);
+INSERT INTO municipality(name,province_id) VALUES ('Kuortane',13);
+INSERT INTO municipality(name,province_id) VALUES ('Kurikka',13);
+INSERT INTO municipality(name,province_id) VALUES ('Lappajärvi',13);
+INSERT INTO municipality(name,province_id) VALUES ('Lapua',13);
+INSERT INTO municipality(name,province_id) VALUES ('Seinäjoki',13);
+INSERT INTO municipality(name,province_id) VALUES ('Soini',13);
+INSERT INTO municipality(name,province_id) VALUES ('Teuva',13);
+INSERT INTO municipality(name,province_id) VALUES ('Vimpeli',13);
+INSERT INTO municipality(name,province_id) VALUES ('Ähtäri',13);
+INSERT INTO municipality(name,province_id) VALUES ('Kaskinen',14);
+INSERT INTO municipality(name,province_id) VALUES ('Korsnäs',14);
+INSERT INTO municipality(name,province_id) VALUES ('Kristiinankaupunki',14);
+INSERT INTO municipality(name,province_id) VALUES ('Kruunupyy',14);
+INSERT INTO municipality(name,province_id) VALUES ('Laihia',14);
+INSERT INTO municipality(name,province_id) VALUES ('Luoto',14);
+INSERT INTO municipality(name,province_id) VALUES ('Maalahti',14);
+INSERT INTO municipality(name,province_id) VALUES ('Mustasaari',14);
+INSERT INTO municipality(name,province_id) VALUES ('Närpiö',14);
+INSERT INTO municipality(name,province_id) VALUES ('Pietarsaari',14);
+INSERT INTO municipality(name,province_id) VALUES ('Pedersören kunta',14);
+INSERT INTO municipality(name,province_id) VALUES ('Uusikaarlepyy',14);
+INSERT INTO municipality(name,province_id) VALUES ('Vaasa',14);
+INSERT INTO municipality(name,province_id) VALUES ('Vöyri',14);
+INSERT INTO municipality(name,province_id) VALUES ('Halsua',15);
+INSERT INTO municipality(name,province_id) VALUES ('Kannus',15);
+INSERT INTO municipality(name,province_id) VALUES ('Kaustinen',15);
+INSERT INTO municipality(name,province_id) VALUES ('Kokkola',15);
+INSERT INTO municipality(name,province_id) VALUES ('Lestijärvi',15);
+INSERT INTO municipality(name,province_id) VALUES ('Perho',15);
+INSERT INTO municipality(name,province_id) VALUES ('Toholampi',15);
+INSERT INTO municipality(name,province_id) VALUES ('Veteli',15);
+INSERT INTO municipality(name,province_id) VALUES ('Alavieska',16);
+INSERT INTO municipality(name,province_id) VALUES ('Haapajärvi',16);
+INSERT INTO municipality(name,province_id) VALUES ('Haapavesi',16);
+INSERT INTO municipality(name,province_id) VALUES ('Hailuoto',16);
+INSERT INTO municipality(name,province_id) VALUES ('Ii',16);
+INSERT INTO municipality(name,province_id) VALUES ('Kalajoki',16);
+INSERT INTO municipality(name,province_id) VALUES ('Kempele',16);
+INSERT INTO municipality(name,province_id) VALUES ('Kuusamo',16);
+INSERT INTO municipality(name,province_id) VALUES ('Kärsämäki',16);
+INSERT INTO municipality(name,province_id) VALUES ('Liminka',16);
+INSERT INTO municipality(name,province_id) VALUES ('Lumijoki',16);
+INSERT INTO municipality(name,province_id) VALUES ('Merijärvi',16);
+INSERT INTO municipality(name,province_id) VALUES ('Muhos',16);
+INSERT INTO municipality(name,province_id) VALUES ('Nivala',16);
+INSERT INTO municipality(name,province_id) VALUES ('Oulainen',16);
+INSERT INTO municipality(name,province_id) VALUES ('Oulu',16);
+INSERT INTO municipality(name,province_id) VALUES ('Pudasjärvi',16);
+INSERT INTO municipality(name,province_id) VALUES ('Pyhäjoki',16);
+INSERT INTO municipality(name,province_id) VALUES ('Pyhäjärvi',16);
+INSERT INTO municipality(name,province_id) VALUES ('Pyhäntä',16);
+INSERT INTO municipality(name,province_id) VALUES ('Raahe',16);
+INSERT INTO municipality(name,province_id) VALUES ('Reisjärvi',16);
+INSERT INTO municipality(name,province_id) VALUES ('Sievi',16);
+INSERT INTO municipality(name,province_id) VALUES ('Siikajoki',16);
+INSERT INTO municipality(name,province_id) VALUES ('Vaala',16);
+INSERT INTO municipality(name,province_id) VALUES ('Siikalatva',16);
+INSERT INTO municipality(name,province_id) VALUES ('Taivalkoski',16);
+INSERT INTO municipality(name,province_id) VALUES ('Tyrnävä',16);
+INSERT INTO municipality(name,province_id) VALUES ('Utajärvi',16);
+INSERT INTO municipality(name,province_id) VALUES ('Ylivieska',16);
+INSERT INTO municipality(name,province_id) VALUES ('Hyrynsalmi',17);
+INSERT INTO municipality(name,province_id) VALUES ('Kajaani',17);
+INSERT INTO municipality(name,province_id) VALUES ('Kuhmo',17);
+INSERT INTO municipality(name,province_id) VALUES ('Paltamo',17);
+INSERT INTO municipality(name,province_id) VALUES ('Puolanka',17);
+INSERT INTO municipality(name,province_id) VALUES ('Ristijärvi',17);
+INSERT INTO municipality(name,province_id) VALUES ('Sotkamo',17);
+INSERT INTO municipality(name,province_id) VALUES ('Suomussalmi',17);
+INSERT INTO municipality(name,province_id) VALUES ('Enontekiö',18);
+INSERT INTO municipality(name,province_id) VALUES ('Inari',18);
+INSERT INTO municipality(name,province_id) VALUES ('Kemi',18);
+INSERT INTO municipality(name,province_id) VALUES ('Keminmaa',18);
+INSERT INTO municipality(name,province_id) VALUES ('Kittilä',18);
+INSERT INTO municipality(name,province_id) VALUES ('Kolari',18);
+INSERT INTO municipality(name,province_id) VALUES ('Kemijärvi',18);
+INSERT INTO municipality(name,province_id) VALUES ('Muonio',18);
+INSERT INTO municipality(name,province_id) VALUES ('Pelkosenniemi',18);
+INSERT INTO municipality(name,province_id) VALUES ('Posio',18);
+INSERT INTO municipality(name,province_id) VALUES ('Ranua',18);
+INSERT INTO municipality(name,province_id) VALUES ('Rovaniemi',18);
+INSERT INTO municipality(name,province_id) VALUES ('Salla',18);
+INSERT INTO municipality(name,province_id) VALUES ('Savukoski',18);
+INSERT INTO municipality(name,province_id) VALUES ('Simo',18);
+INSERT INTO municipality(name,province_id) VALUES ('Sodankylä',18);
+INSERT INTO municipality(name,province_id) VALUES ('Tervola',18);
+INSERT INTO municipality(name,province_id) VALUES ('Tornio',18);
+INSERT INTO municipality(name,province_id) VALUES ('Pello',18);
+INSERT INTO municipality(name,province_id) VALUES ('Utsjoki',18);
+INSERT INTO municipality(name,province_id) VALUES ('Ylitornio',18);
+INSERT INTO municipality(name,province_id) VALUES ('Brändö',19);
+INSERT INTO municipality(name,province_id) VALUES ('Eckerö',19);
+INSERT INTO municipality(name,province_id) VALUES ('Finström',19);
+INSERT INTO municipality(name,province_id) VALUES ('Föglö',19);
+INSERT INTO municipality(name,province_id) VALUES ('Geta',19);
+INSERT INTO municipality(name,province_id) VALUES ('Hammarland',19);
+INSERT INTO municipality(name,province_id) VALUES ('Jomala',19);
+INSERT INTO municipality(name,province_id) VALUES ('Kumlinge',19);
+INSERT INTO municipality(name,province_id) VALUES ('Kökar',19);
+INSERT INTO municipality(name,province_id) VALUES ('Lemland',19);
+INSERT INTO municipality(name,province_id) VALUES ('Lumparland',19);
+INSERT INTO municipality(name,province_id) VALUES ('Maarianhamina',19);
+INSERT INTO municipality(name,province_id) VALUES ('Saltvik',19);
+INSERT INTO municipality(name,province_id) VALUES ('Sottunga',19);
+INSERT INTO municipality(name,province_id) VALUES ('Sund',19);
+INSERT INTO municipality(name,province_id) VALUES ('Vårdö',19);
 
-INSERT INTO delivery VALUES('Nouto');
-INSERT INTO delivery VALUES('Postitus');
+INSERT INTO delivery(name) VALUES('Nouto');
+INSERT INTO delivery(name) VALUES('Postitus');
 
-INSERT INTO user(email, username, password, municipality) VALUES('username2022@mail.fi', 'username2022', 'Asdfghjk', 'Joensuu');
-INSERT INTO user(email, username, password, municipality) VALUES('username23@mail.fi', 'username23', 'Qwertyui', 'Vantaa');
+INSERT INTO user(email, username, password, municipality_id) VALUES('username2022@mail.fi', 'username2022', 'Asdfghjk', 105);
+INSERT INTO user(email, username, password, municipality_id) VALUES('username23@mail.fi', 'username23', 'Qwertyui', 11);
 
 INSERT INTO plant(name, price, imagename, description, instruction, user_id) 
 VALUES('Peikonlehti', 3, 'dasjdsalkdj832', 'Isolehtinen kasvi, joka tekee ilmajuuria.', 'Peikonlehti tarvitsee paljon vettä ja valoa.', 2);
@@ -444,15 +447,14 @@ VALUES('Aloevera', 2, 'asdsaddasd2sdfe', 'Isosta mehikasvista otettu pistokas.',
 INSERT INTO plant(name, price, imagename, description, instruction, user_id) 
 VALUES('Anopinkieli', 1, 'asdsaddasd2sdfe', 'Vihreäraidallinen anopinkieli, suorat lehdet.', 'Hiekkainen kasvualusta ja kastelu vain tarvittaessa.', 2);
 
-INSERT INTO plantdelivery(plant_id, delivery) VALUES(1, 'Nouto');
-INSERT INTO plantdelivery(plant_id, delivery) VALUES(1, 'Postitus');
-INSERT INTO plantdelivery(plant_id, delivery) VALUES (2, 'Postitus');
-INSERT INTO plantdelivery(plant_id, delivery) VALUES (3, 'Nouto');
+INSERT INTO plantdelivery(plant_id, delivery_id) VALUES(1, 1);
+INSERT INTO plantdelivery(plant_id, delivery_id) VALUES(1, 2);
+INSERT INTO plantdelivery(plant_id, delivery_id) VALUES (2, 2);
+INSERT INTO plantdelivery(plant_id, delivery_id) VALUES (3, 1);
 
 DROP USER if EXISTS psuser@localhost;
 CREATE USER psuser@localhost IDENTIFIED BY 'peikonlehti';
 GRANT SELECT, INSERT, UPDATE, DELETE ON pistokkaat.* TO psuser@localhost;
 
-/* DROP INDEX if EXISTS idx_plantname; */
 CREATE INDEX idx_plantname
 ON plant(NAME);

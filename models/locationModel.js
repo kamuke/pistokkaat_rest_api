@@ -6,7 +6,9 @@ const promisePool = pool.promise();
 
 const getAllLocations = async (next) => {
     try {
-        const [rows] = await promisePool.query(`SELECT municipality, province FROM municipality;`);
+        const [rows] = await promisePool.query(`SELECT municipality.name AS municipality, province.name AS province
+                                                FROM municipality
+                                                INNER JOIN province ON municipality.province_id = province.province_id;`);
         return rows;
     } catch (e) {
         console.error('getAllLocations', e.message);

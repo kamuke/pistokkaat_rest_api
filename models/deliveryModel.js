@@ -6,7 +6,7 @@ const promisePool = pool.promise();
 
 const getAllDeliveries = async (next) => {
     try {
-        const [rows] = await promisePool.query(`SELECT delivery FROM delivery;`);
+        const [rows] = await promisePool.query(`SELECT delivery_id, name FROM delivery;`);
         return rows;
     } catch (e) {
         console.error('getAllDeliveries', e.message);

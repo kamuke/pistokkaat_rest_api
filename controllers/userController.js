@@ -76,7 +76,7 @@ const user_post = async (req, res, next) => {
             req.body.email,
             req.body.username,
             req.body.password,
-            req.body.municipality
+            req.body.municipality_id
         ];
 
         const result = await addUser(data, next);
@@ -111,13 +111,13 @@ const user_put = async (req, res, next) => {
         const users = await getAllUsers(next);
 
         // Check if email is already in use
-        if (users.find(user => user && user.email === req.body.email && user.user_id !== req.body.id)) {
+        if (users.find(user => user && user.email === req.body.email && user.user_id !== req.body.user_id)) {
             next(httpError('Email already in use', 400));
             return;
         }
 
         // Check if username is already in use
-        if (users.find(user => user && user.username === req.body.username && user.user_id !== req.body.id)) {
+        if (users.find(user => user && user.username === req.body.username && user.user_id !== req.body.user_id)) {
             next(httpError('Username already in use', 400));
             return;
         }
@@ -126,8 +126,8 @@ const user_put = async (req, res, next) => {
             req.body.email,
             req.body.username,
             req.body.password,
-            req.body.municipality,
-            req.body.id
+            req.body.municipality_id,
+            req.body.user_id
         ];
 
         const result = await updateUser(data, next);

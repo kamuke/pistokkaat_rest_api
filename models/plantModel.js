@@ -13,20 +13,22 @@ const getAllPlants = async (next) => {
                                                             plant.description, 
                                                             plant.instruction, 
                                                             plant.imagename, 
-                                                            GROUP_CONCAT(DISTINCT plantdelivery.delivery ORDER BY plantdelivery.delivery ASC) AS delivery, 
+                                                            GROUP_CONCAT(DISTINCT delivery.name ORDER BY delivery.name ASC) AS delivery,
                                                             COUNT(plantfavourites.plant_id) AS favourites, 
                                                             plant.created, 
                                                             plant.edited, 
                                                             user.user_id, 
                                                             user.username, 
                                                             user.email, 
-                                                            user.municipality AS location,
-                                                            COUNT(userlikes.liked) AS likes
+                                                            municipality.name AS location,
+                                                            COUNT(userlikes.liked_id) AS likes
                                                 FROM 		plant
                                                 INNER JOIN 	user ON plant.user_id = user.user_id
+                                                INNER JOIN 	municipality ON user.municipality_id = municipality.municipality_id
                                                 INNER JOIN 	plantdelivery ON plant.plant_id = plantdelivery.plant_id
+                                                INNER JOIN 	delivery ON plantdelivery.delivery_id = delivery.delivery_id
                                                 LEFT JOIN 	plantfavourites ON plant.plant_id = plantfavourites.plant_id
-                                                LEFT JOIN 	userlikes ON user.user_id = userlikes.liked
+                                                LEFT JOIN 	userlikes ON user.user_id = userlikes.liked_id
                                                 GROUP BY 	plant.plant_id
                                                 ORDER BY 	plant.created DESC;`);
         return rows;
@@ -38,26 +40,28 @@ const getAllPlants = async (next) => {
 
 const getPlant = async (plantId, next) => {
     try {
-        const [rows] = await promisePool.query(`SELECT        plant.plant_id, 
+        const [rows] = await promisePool.query(`SELECT 		plant.plant_id, 
                                                             plant.name, 
                                                             plant.price, 
                                                             plant.description, 
                                                             plant.instruction, 
                                                             plant.imagename, 
-                                                            GROUP_CONCAT(DISTINCT plantdelivery.delivery ORDER BY plantdelivery.delivery ASC) AS delivery, 
+                                                            GROUP_CONCAT(DISTINCT delivery.name ORDER BY delivery.name ASC) AS delivery,
                                                             COUNT(plantfavourites.plant_id) AS favourites, 
                                                             plant.created, 
                                                             plant.edited, 
                                                             user.user_id, 
                                                             user.username, 
                                                             user.email, 
-                                                            user.municipality AS location,
-                                                            COUNT(userlikes.liked) AS likes
+                                                            municipality.name AS location,
+                                                            COUNT(userlikes.liked_id) AS likes
                                                 FROM 		plant
                                                 INNER JOIN 	user ON plant.user_id = user.user_id
+                                                INNER JOIN 	municipality ON user.municipality_id = municipality.municipality_id
                                                 INNER JOIN 	plantdelivery ON plant.plant_id = plantdelivery.plant_id
+                                                INNER JOIN 	delivery ON plantdelivery.delivery_id = delivery.delivery_id
                                                 LEFT JOIN 	plantfavourites ON plant.plant_id = plantfavourites.plant_id
-                                                LEFT JOIN 	userlikes ON user.user_id = userlikes.liked
+                                                LEFT JOIN 	userlikes ON user.user_id = userlikes.liked_id
                                                 GROUP BY 	plant.plant_id
                                                 HAVING 	 	plant.plant_id = ?;`, [plantId]);
         return rows;
@@ -76,7 +80,7 @@ const addPlant = async(data, delivery, next) => {
         const firstQuery = `INSERT INTO plant(name, price, imagename, description, instruction, user_id) 
                    VALUES(?, ?, ?, ?, ?, ?);`;
 
-        let secondQuery = `INSERT INTO plantdelivery(plant_id, delivery) VALUES(LAST_INSERT_ID(), ?)`;
+        let secondQuery = `INSERT INTO plantdelivery(plant_id, delivery_id) VALUES(LAST_INSERT_ID(), ?)`;
 
         // If delivery has more than one value, add one more insert
         if (delivery.length > 1) {
@@ -115,7 +119,7 @@ const updatePlant = async (data, delivery, next) => {
         const secondQuery = `DELETE FROM plantdelivery WHERE plant_id=?`;
 
         // If delivery has more than two values, add one more insert
-        let thirdQuery = `INSERT INTO plantdelivery(plant_id, delivery) VALUES(?, ?)`;
+        let thirdQuery = `INSERT INTO plantdelivery(plant_id, delivery_id) VALUES(?, ?)`;
 
         if (delivery.length > 2) {
             thirdQuery += `, (?, ?)`;

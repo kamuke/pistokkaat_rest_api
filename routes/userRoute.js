@@ -20,7 +20,7 @@ router.route('/').
             withMessage('Password must have minimum of 8 and maximum of 80 characters, and at least one capital character.').
             isLength({max: 80}).
             escape(),
-        body('municipality').escape(),
+        body('municipality_id').isInt(),
         user_post).
     put(body('email').
             isEmail().
@@ -36,8 +36,8 @@ router.route('/').
             withMessage('Password must have minimum of 8 and maximum of 80 characters, and at least one capital character.').
             isLength({max: 80}).
             escape(),
-        body('municipality').escape(),
-        body('id').isInt(),
+        body('municipality_id').isInt(),
+        body('user_id').isInt(),
         user_put);
 
 router.route('/:id').

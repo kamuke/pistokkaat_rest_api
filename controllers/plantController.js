@@ -98,6 +98,8 @@ const plant_get = async (req, res, next) => {
 // have to change in front side so that the form posts delivery input as array? Maybe? not sure 
 const plant_post = async (req, res, next) => {
     try {
+
+        console.log(req.body);
         // Extract the validation errors from a request.
         const errors = validationResult(req);
 
@@ -114,10 +116,10 @@ const plant_post = async (req, res, next) => {
             req.file.filename,
             req.body.description,
             req.body.instruction,
-            req.body.seller
+            req.body.seller_id
         ]
 
-        const delivery = req.body.delivery.split(', ');
+        const delivery = req.body.delivery.split(',');
 
         const result = await addPlant(data, delivery, next);
 
@@ -153,15 +155,15 @@ const plant_put = async (req, res, next) => {
             req.body.price,
             req.body.description,
             req.body.instruction,
-            req.body.id
+            req.body.plant_id
         ];
 
-        const delivery = req.body.delivery.split(', ');
-        delivery.splice(0, 0, req.body.id); // Delivery also needs plant's id to insert data
+        const delivery = req.body.delivery.split(',');
+        delivery.splice(0, 0, req.body.plant_id); // Delivery also needs plant's id to insert data
 
         // If there is more than one delivery option, add another plant's id
         if (delivery.length > 2) {
-            delivery.splice(2, 0, req.body.id);
+            delivery.splice(2, 0, req.body.plant_id);
         }
   
         const result = await updatePlant(data, delivery, next);

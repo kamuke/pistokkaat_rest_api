@@ -3,7 +3,7 @@
 const express = require('express');
 const {check, body} = require('express-validator');
 const router = express.Router();
-const {user_list_get, user_get, user_post, user_put, user_delete} = require('../controllers/userController');
+const {user_list_get, user_get, user_post, user_put, user_delete, users_plant_list_get, check_token} = require('../controllers/userController');
 
 router.route('/').
     get(user_list_get).
@@ -40,10 +40,16 @@ router.route('/').
         body('user_id').isInt(),
         user_put);
 
+router.get('/token', check_token);
+
 router.route('/:id').
     get(check('id').isInt(),
         user_get).
     delete(check('id').isInt(),
         user_delete);
+
+router.route('/:id/plant').
+    get(check('id').isInt(),
+        users_plant_list_get);
 
 module.exports = router;

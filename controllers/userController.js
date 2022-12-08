@@ -1,6 +1,6 @@
 // userController
 'use strict';
-const {getAllUsers, getUser, addUser, updateUser, deleteUser} = require('../models/userModel');
+const {getAllUsers, getUser, addUser, updateUser, deleteUser, getUsersAllPlants} = require('../models/userModel');
 const {httpError} = require('../utils/errors');
 const {validationResult} = require('express-validator');
 
@@ -170,10 +170,70 @@ const user_delete = async (req, res, next) => {
     }
 };
 
+const users_plant_list_get = async (req, res, next) => {
+    try {
+        // Extract the validation errors from a request.
+        const errors = validationResult(req);
+
+        // There are errors in data
+        if (!errors.isEmpty()) {
+            console.error('user_plant_list_get validation', errors.array());
+            next(httpError('Invalid data', 400));
+            return;
+        }
+
+        let result = await getUsersAllPlants(req.params.id, next);
+
+        if (result.length < 1) {
+            next(httpError('No plants found', 404));
+            return;
+        }
+
+        // Iterate and return edited item: 
+        // split delivery to array and add seller object to single item
+        result = result.map(item => {
+            item.delivery = item.delivery.split(',');
+
+            let user = {
+                user_id: item.user_id,
+                username: item.username,
+                email: item.email,
+                location: item.location,
+                likes: item.likes
+            };
+
+            delete item.user_id;
+            delete item.username;
+            delete item.email;
+            delete item.location;
+            delete item.likes;
+
+            item.seller = user;
+
+            return item;
+        });
+
+        res.json(result);
+    } catch (e) {
+        console.error('user_plant_list_get', e.message);
+        next(httpError('Internal server error', 500));
+    }
+};
+
+const check_token = (req, res, next) => {
+    if (!req.user) {
+      next(httpError('Token not valid', 403));
+    } else {
+      res.json({ user: req.user });
+    }
+};
+
 module.exports = {
     user_list_get,
     user_get,
     user_post,
     user_put,
     user_delete,
+    users_plant_list_get,
+    check_token,
 };

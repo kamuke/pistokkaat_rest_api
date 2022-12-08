@@ -38,7 +38,7 @@ const getAllPlants = async (next) => {
     }
 };
 
-const getPlant = async (plantId, next) => {
+const getPlant = async (data, next) => {
     try {
         const [rows] = await promisePool.query(`SELECT 		plant.plant_id, 
                                                             plant.name, 
@@ -63,7 +63,7 @@ const getPlant = async (plantId, next) => {
                                                 LEFT JOIN 	plantfavourites ON plant.plant_id = plantfavourites.plant_id
                                                 LEFT JOIN 	userlikes ON user.user_id = userlikes.liked_id
                                                 GROUP BY 	plant.plant_id
-                                                HAVING 	 	plant.plant_id = ?;`, [plantId]);
+                                                HAVING 	 	plant.plant_id = ?;`, data);
         return rows;
     } catch (e) {
         console.error('getPlant', e.message);
@@ -71,12 +71,13 @@ const getPlant = async (plantId, next) => {
     }
 };
 
-// TODO: Only logged users can add plants
 const addPlant = async(data, delivery, next) => {
-    const connection = await promisePool.getConnection();
+    let connection;
     let firstQueryRows = [];
 
     try {
+        connection = await promisePool.getConnection();
+
         const firstQuery = `INSERT INTO plant(name, price, imagename, description, instruction, user_id) 
                    VALUES(?, ?, ?, ?, ?, ?);`;
 
@@ -107,14 +108,26 @@ const addPlant = async(data, delivery, next) => {
     }
 };
 
-// TODO: users can only update own plants, except admins.
+// TODO: add user param when getting it from front
 const updatePlant = async (data, delivery, next) => {
-    const connection = await promisePool.getConnection();
+    let connection;
+    let firstQuery;
     let firstQueryRows = [];
 
     try {
-        const firstQuery = `UPDATE plant SET name=?, price=?, description=?, instruction=?, edited=NOW()
-                          WHERE plant_id=?;`;
+        connection = await promisePool.getConnection();
+
+        // TODO: if user.role === 0, can edit any plant
+        // if (user.role === 0) {
+            // firstQuery = `UPDATE plant SET name=?, price=?, description=?, instruction=?, edited=NOW()
+            // WHERE plant_id=?;`;
+        // } else {
+            // firstQuery = `UPDATE plant SET name=?, price=?, description=?, instruction=?, edited=NOW()
+            // WHERE plant_id=? AND user_id=?;`;
+        // }
+
+        firstQuery = `UPDATE plant SET name=?, price=?, description=?, instruction=?, edited=NOW()
+                      WHERE plant_id=? AND user_id=?;`;
 
         const secondQuery = `DELETE FROM plantdelivery WHERE plant_id=?`;
 
@@ -146,10 +159,21 @@ const updatePlant = async (data, delivery, next) => {
     }
 };
 
-// TODO: users can only delete own plants, except admins.
-const deletePlant = async (plantId, next) => {
+// TODO: add user param when getting it from front
+const deletePlant = async (data, next) => {
     try {
-        const [rows] = await promisePool.execute(`DELETE FROM plant WHERE plant_id=?`, [plantId]);
+        // TODO: if user.role === 0, admin can delete anything
+        // let sql;
+        // const params = data;
+        // if (user.role === 0) {
+            // sql = `DELETE FROM plant WHERE plant_id=?`
+        // } else {
+            // sql = `DELETE FROM plant WHERE plant_id=? AND user_id=?`
+            // params.push(user.user_id);
+        // }
+
+        const [rows] = await promisePool.execute(`DELETE FROM plant WHERE plant_id=? AND user_id=?`, data);
+
         return rows;
     } catch (e) {
         console.error('deletePlant', e.message);

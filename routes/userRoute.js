@@ -3,10 +3,12 @@
 const express = require('express');
 const {check, body} = require('express-validator');
 const router = express.Router();
+const passport = require('../utils/pass');
 const {user_list_get, user_get, user_post, user_put, user_delete, users_plant_list_get, check_token} = require('../controllers/userController');
 
 router.route('/').
-    get(user_list_get).
+    get(passport.authenticate('jwt', {session: false}),
+        user_list_get).
     post(body('email').
             isEmail().
             withMessage('Email must be valid email and maximum of 60 characters.').
@@ -21,8 +23,18 @@ router.route('/').
             isLength({max: 80}).
             escape(),
         body('municipality_id').isInt(),
-        user_post).
-    put(body('email').
+        user_post);
+
+router.get('/token', check_token);
+
+router.route('/:id').
+    get(check('id').isInt(),
+        user_get).
+    delete(check('id').isInt(),
+        passport.authenticate('jwt', {session: false}),
+        user_delete).
+    put(check('id').isInt(),
+        body('email').
             isEmail().
             withMessage('Email must be valid email and maximum of 60 characters.').
             normalizeEmail().
@@ -37,16 +49,8 @@ router.route('/').
             isLength({max: 80}).
             escape(),
         body('municipality_id').isInt(),
-        body('user_id').isInt(),
+        passport.authenticate('jwt', {session: false}),
         user_put);
-
-router.get('/token', check_token);
-
-router.route('/:id').
-    get(check('id').isInt(),
-        user_get).
-    delete(check('id').isInt(),
-        user_delete);
 
 router.route('/:id/plant').
     get(check('id').isInt(),

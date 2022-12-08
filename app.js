@@ -23,7 +23,7 @@ app.use(express.static('uploads'));
 
 app.use('/auth', authRoute);
 app.use('/plant', plantRoute);
-app.use('/user', passport.authenticate('jwt', {session: false}), userRoute);
+app.use('/user', userRoute);
 app.use('/delivery', deliveryRoute);
 app.use('/location', locationRoute);
 

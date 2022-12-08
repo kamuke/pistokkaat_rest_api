@@ -18,6 +18,8 @@ const plant_list_get = async (req, res, next) => {
         result = result.map(item => {
             item.delivery = item.delivery.split(',');
 
+            // TODO: add email to user only when getting req.user from front
+
             let user = {
                 user_id: item.user_id,
                 username: item.username,
@@ -56,7 +58,9 @@ const plant_get = async (req, res, next) => {
             return;
         }
 
-        let result = await getPlant(req.params.id, next);
+        const data =  [req.params.id];
+
+        let result = await getPlant(data, next);
 
         if (result.length < 1) {
             next(httpError('No plant found', 404));
@@ -67,6 +71,8 @@ const plant_get = async (req, res, next) => {
         // split delivery to array and add seller object to single item
         result = result.map(item => {
             item.delivery = item.delivery.split(',');
+
+            // TODO: add email to user only when getting req.user from front
 
             let user = {
                 user_id: item.user_id,
@@ -94,12 +100,8 @@ const plant_get = async (req, res, next) => {
     }
 };
 
-// TODO: should receive deliverys as an array from front
-// have to change in front side so that the form posts delivery input as array? Maybe? not sure 
 const plant_post = async (req, res, next) => {
     try {
-
-        console.log(req.body);
         // Extract the validation errors from a request.
         const errors = validationResult(req);
 
@@ -110,13 +112,14 @@ const plant_post = async (req, res, next) => {
             return;
         }
 
+        // TODO: get req.user.user_id from front
         const data = [
             req.body.name,
             req.body.price,
             req.file.filename,
             req.body.description,
             req.body.instruction,
-            req.body.seller_id
+            req.body.user_id
         ]
 
         const delivery = req.body.delivery.split(',');
@@ -150,22 +153,25 @@ const plant_put = async (req, res, next) => {
             return;
         }
 
+        // TODO: get req.user.user_id from front
         const data = [
-            req.body.name,
-            req.body.price,
-            req.body.description,
-            req.body.instruction,
-            req.body.plant_id
-        ];
+                req.body.name,
+                req.body.price,
+                req.body.description,
+                req.body.instruction,
+                req.params.id,
+                req.body.user_id,
+            ];
 
         const delivery = req.body.delivery.split(',');
-        delivery.splice(0, 0, req.body.plant_id); // Delivery also needs plant's id to insert data
+        delivery.splice(0, 0, req.params.id); // Delivery also needs plant's id to insert data
 
         // If there is more than one delivery option, add another plant's id
         if (delivery.length > 2) {
-            delivery.splice(2, 0, req.body.plant_id);
+            delivery.splice(2, 0, req.params.id);
         }
   
+        // TODO: add req.user as param after getting it from front
         const result = await updatePlant(data, delivery, next);
 
         if (result[0].affectedRows < 1) {
@@ -192,7 +198,10 @@ const plant_delete = async (req, res, next) => {
             return;
         }
 
-        const result = await deletePlant(req.params.id, next);
+        const data = [req.params.id, req.body.user_id];
+
+        // TODO: add req.user as param after getting it from front
+        const result = await deletePlant(data, next);
   
         if (result.affectedRows < 1) {
             next(httpError('No plant deleted', 400));

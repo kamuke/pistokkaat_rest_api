@@ -4,6 +4,7 @@ const express = require('express');
 const {check, body} = require('express-validator');
 const multer  = require('multer');
 const router = express.Router();
+const passport = require('../utils/pass');
 const {plant_list_get, plant_get, plant_post, plant_delete, plant_put} = require('../controllers/plantController');
 
 const fileFilter = (req, file, cb) => {
@@ -16,20 +17,11 @@ const fileFilter = (req, file, cb) => {
     }
 };
 
-const testFile = (req, res, next) => {
-    if (req.file) {
-        next();
-    } else {
-        res.status(400).json({errors: 'File is not image'});
-    }
-}
-
-const upload = multer({ dest: './uploads/', fileFilter });
+const upload = multer({dest: './uploads/', fileFilter});
 
 router.route('/').
     get(plant_list_get).
     post(upload.single('image'),
-        testFile,
         body('name').
             isLength({min: 3, max: 200}).
             withMessage('Name must have minimum of 3 and maximum of 200 characters.').
@@ -45,9 +37,17 @@ router.route('/').
             withMessage('Instruction must have minimum of 30 and maximum of 280 characters.').
             escape(),
         body('delivery').escape(),
-        body('seller_id').isInt(),
-        plant_post).
-    put(body('name').
+        passport.authenticate('jwt', {session: false}),
+        plant_post);
+
+router.route('/:id').
+    get(check('id').isInt(),
+        plant_get).
+    delete(check('id').isInt(),
+        passport.authenticate('jwt', {session: false}),
+        plant_delete).
+    put(check('id').isInt(),
+        body('name').
             isLength({min: 3, max: 200}).
             withMessage('Name must have minimum of 3 and maximum of 200 characters.').
             escape(),
@@ -62,13 +62,7 @@ router.route('/').
             withMessage('Instruction must have minimum of 30 and maximum of 280 characters.').
             escape(),
         body('delivery').escape(),
-        body('plant_id').isInt(),
+        passport.authenticate('jwt', {session: false}),
         plant_put);
-
-router.route('/:id').
-    get(check('id').isInt(),
-        plant_get).
-    delete(check('id').isInt(),
-        plant_delete);
 
 module.exports = router;

@@ -4,7 +4,8 @@ const express = require('express');
 const {check, body} = require('express-validator');
 const router = express.Router();
 const passport = require('../utils/pass');
-const {user_list_get, user_get, user_post, user_put, user_delete, check_token} = require('../controllers/userController');
+const {user_list_get, user_get, user_put, user_delete, check_token} = require('../controllers/userController');
+const {favourite_list_get} = require('../controllers/favouriteController');
 const {users_plant_list_get} = require('../controllers/plantController');
 
 const optionalAuth = (req, res, next) => {
@@ -45,6 +46,9 @@ router.route('/').
         user_put);
 
 router.get('/token', check_token);
+
+router.route('/favourite').
+    get(passport.authenticate('jwt', {session: false}), favourite_list_get);
 
 router.route('/:id').
     get(check('id').isInt(),

@@ -9,14 +9,11 @@ const getAllUsers = async (next) => {
         const [rows] = await promisePool.query(`SELECT      user.user_id, 
                                                             user.email, 
                                                             user.username, 
-                                                            municipality.name as location, 
-                                                            COUNT(userlikes.liked_id) AS likes, 
+                                                            municipality.name as location,
                                                             user.role
                                                 FROM        user
                                                 INNER JOIN  municipality 
                                                 ON          user.municipality_id = municipality.municipality_id
-                                                LEFT JOIN   userlikes 
-                                                ON          user.user_id = userlikes.liked_id
                                                 GROUP BY    user.user_id;`);
         return rows;
     } catch (e) {
@@ -30,15 +27,12 @@ const getUser = async (data, next) => {
         const [rows] = await promisePool.query(`SELECT      user.user_id, 
                                                             user.email, 
                                                             user.username, 
-                                                            municipality.name as location, 
-                                                            COUNT(userlikes.liked_id) AS likes,
+                                                            municipality.name as location,
                                                             user.password,
                                                             user.role
                                                 FROM        user
                                                 INNER JOIN  municipality 
                                                 ON          user.municipality_id = municipality.municipality_id
-                                                LEFT JOIN   userlikes 
-                                                ON          user.user_id = userlikes.liked_id
                                                 GROUP BY    user.user_id     
                                                 HAVING      user_id=?;`, 
                                                 data);

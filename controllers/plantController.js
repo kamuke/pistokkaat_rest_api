@@ -13,16 +13,13 @@ const plant_list_get = async (req, res, next) => {
             return;
         }
 
-        // Iterate and return edited item: 
-        // split delivery to array and add seller object to single item
+        // Iterate and return edited item: add seller object to single item
         result = result.map(item => {
-            item.delivery = item.delivery.split(',');
 
             let user = {
                 user_id: item.user_id,
                 username: item.username,
-                location: item.location,
-                likes: item.likes
+                location: item.location
             };
 
             // If user is authenticated, add email to user's info
@@ -69,13 +66,10 @@ const plant_get = async (req, res, next) => {
             return;
         }
 
-        result.delivery = result.delivery.split(',');
-
         let user = {
             user_id: result.user_id,
             username: result.username,
-            location: result.location,
-            likes: result.likes
+            location: result.location
         };
 
         // If user is authenticated, add email to user's info

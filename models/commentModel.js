@@ -18,7 +18,7 @@ const getComments = async (data, next) => {
                                                 ORDER BY    comment.created;`, data);
         return rows;
     } catch (e) {
-        console.error('getPlantsComments', e.message);
+        console.error('getComments', e.message);
         next(httpError('Database error', 500));
     }
 };

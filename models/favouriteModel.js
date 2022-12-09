@@ -12,8 +12,16 @@ const getFavourites = async (data, next) => {
                                                             plant.description,
                                                             plant.instruction,
                                                             plant.imagename,
-                                                            GROUP_CONCAT(DISTINCT delivery.name ORDER BY delivery.name ASC SEPARATOR ', ') AS delivery,
-                                                            (SELECT COUNT(plantfavourites.plant_id) FROM plantfavourites WHERE plantfavourites.plant_id = plant.plant_id) AS favourites,
+                                                            GROUP_CONCAT(
+                                                                DISTINCT delivery.name 
+                                                                ORDER BY delivery.name ASC 
+                                                                SEPARATOR ', '
+                                                            ) AS delivery,
+                                                            (
+                                                                SELECT COUNT(plantfavourites.plant_id) 
+                                                                FROM plantfavourites 
+                                                                WHERE plantfavourites.plant_id = plant.plant_id
+                                                            ) AS favourites,
                                                             plant.created,
                                                             plant.edited,
                                                             user.user_id, 

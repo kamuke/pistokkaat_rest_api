@@ -13,8 +13,16 @@ const getAllPlants = async (next) => {
                                                             plant.description, 
                                                             plant.instruction, 
                                                             plant.imagename, 
-                                                            GROUP_CONCAT(DISTINCT delivery.name ORDER BY delivery.name ASC SEPARATOR ', ') AS delivery,
-                                                            (SELECT COUNT(plant_id) FROM plantfavourites WHERE plant_id = plant.plant_id) AS favourites,
+                                                            GROUP_CONCAT(
+                                                                DISTINCT delivery.name 
+                                                                ORDER BY delivery.name ASC 
+                                                                SEPARATOR ', '
+                                                            ) AS delivery,
+                                                            (
+                                                                SELECT COUNT(plant_id) 
+                                                                FROM plantfavourites 
+                                                                WHERE plant_id = plant.plant_id
+                                                            ) AS favourites,
                                                             plant.created, 
                                                             plant.edited, 
                                                             user.user_id, 
@@ -22,10 +30,14 @@ const getAllPlants = async (next) => {
                                                             user.email, 
                                                             municipality.name AS location
                                               FROM 			plant
-                                              INNER JOIN 	user ON plant.user_id = user.user_id
-                                              INNER JOIN 	municipality ON user.municipality_id = municipality.municipality_id
-                                              INNER JOIN 	plantdelivery ON plant.plant_id = plantdelivery.plant_id
-                                              INNER JOIN 	delivery ON plantdelivery.delivery_id = delivery.delivery_id
+                                              INNER JOIN 	user 
+                                              ON            plant.user_id = user.user_id
+                                              INNER JOIN 	municipality 
+                                              ON            user.municipality_id = municipality.municipality_id
+                                              INNER JOIN 	plantdelivery
+                                              ON            plant.plant_id = plantdelivery.plant_id
+                                              INNER JOIN 	delivery 
+                                              ON            plantdelivery.delivery_id = delivery.delivery_id
                                               GROUP BY 	    plant.plant_id
                                               ORDER BY 	    plant.created DESC;`);
         return rows;
@@ -43,8 +55,16 @@ const getPlant = async (data, next) => {
                                                             plant.description, 
                                                             plant.instruction, 
                                                             plant.imagename, 
-                                                            GROUP_CONCAT(DISTINCT delivery.name ORDER BY delivery.name ASC SEPARATOR ', ') AS delivery,
-                                                            (SELECT COUNT(plant_id) FROM plantfavourites WHERE plant_id = plant.plant_id) AS favourites,
+                                                            GROUP_CONCAT(
+                                                                DISTINCT delivery.name 
+                                                                ORDER BY delivery.name ASC 
+                                                                SEPARATOR ', '
+                                                            ) AS delivery,
+                                                            (
+                                                                SELECT COUNT(plant_id) 
+                                                                FROM plantfavourites 
+                                                                WHERE plant_id = plant.plant_id
+                                                            ) AS favourites,
                                                             plant.created, 
                                                             plant.edited, 
                                                             user.user_id, 
@@ -185,25 +205,30 @@ const getUsersAllPlants = async (data, next) => {
                                                             plant.description, 
                                                             plant.instruction, 
                                                             plant.imagename, 
-                                                            GROUP_CONCAT(DISTINCT delivery.name ORDER BY delivery.name ASC) AS delivery,
-                                                            COUNT(plantfavourites.plant_id) AS favourites, 
+                                                            GROUP_CONCAT(
+                                                                DISTINCT delivery.name 
+                                                                ORDER BY delivery.name ASC
+                                                                SEPARATOR ', '
+                                                            ) AS delivery,
+                                                            (
+                                                                SELECT COUNT(plant_id) 
+                                                                FROM plantfavourites 
+                                                                WHERE plant_id = plant.plant_id
+                                                            ) AS favourites,
                                                             plant.created, 
                                                             plant.edited, 
                                                             user.user_id, 
                                                             user.username, 
                                                             user.email, 
-                                                            municipality.name AS location,
-                                                            COUNT(userlikes.liked_id) AS likes
+                                                            municipality.name AS location
                                                 FROM 		plant
                                                 INNER JOIN 	user ON plant.user_id = user.user_id
                                                 INNER JOIN 	municipality ON user.municipality_id = municipality.municipality_id
                                                 INNER JOIN 	plantdelivery ON plant.plant_id = plantdelivery.plant_id
                                                 INNER JOIN 	delivery ON plantdelivery.delivery_id = delivery.delivery_id
-                                                LEFT JOIN 	plantfavourites ON plant.plant_id = plantfavourites.plant_id
-                                                LEFT JOIN 	userlikes ON user.user_id = userlikes.liked_id
+                                                WHERE		user.user_id=?
                                                 GROUP BY 	plant.plant_id
-                                                HAVING 		user.user_id=?
-                                                ORDER BY 	plant.created DESC;`, data);
+                                                ORDER BY 	plant.created DESC`, data);
         return rows;
     } catch (e) {
         console.error('getUsersAllPlants', e.message);

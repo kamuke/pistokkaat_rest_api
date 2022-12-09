@@ -13,20 +13,25 @@ const plant_list_get = async (req, res, next) => {
             return;
         }
 
+        console.log(req.authenticated);
+        console.log(req.user);
+
         // Iterate and return edited item: 
         // split delivery to array and add seller object to single item
         result = result.map(item => {
             item.delivery = item.delivery.split(',');
 
-            // TODO: add email to user only when getting req.user from front
-
             let user = {
                 user_id: item.user_id,
                 username: item.username,
-                email: item.email,
                 location: item.location,
                 likes: item.likes
             };
+
+            // If user is authenticated, add email to user's info
+            if (req.authenticated) {
+                user.email = item.email;
+            }
 
             delete item.user_id;
             delete item.username;
@@ -72,15 +77,17 @@ const plant_get = async (req, res, next) => {
         result = result.map(item => {
             item.delivery = item.delivery.split(',');
 
-            // TODO: add email to user only when getting req.user from front
-
             let user = {
                 user_id: item.user_id,
                 username: item.username,
-                email: item.email,
                 location: item.location,
                 likes: item.likes
             };
+
+            // If user is authenticated, add email to user's info
+            if (req.authenticated) {
+                user.email = item.email;
+            }
 
             delete item.user_id;
             delete item.username;
@@ -112,14 +119,13 @@ const plant_post = async (req, res, next) => {
             return;
         }
 
-        // TODO: get req.user.user_id from front
         const data = [
             req.body.name,
             req.body.price,
             req.file.filename,
             req.body.description,
             req.body.instruction,
-            req.body.user_id
+            req.user.user_id
         ]
 
         const delivery = req.body.delivery.split(',');
@@ -153,14 +159,13 @@ const plant_put = async (req, res, next) => {
             return;
         }
 
-        // TODO: get req.user.user_id from front
         const data = [
                 req.body.name,
                 req.body.price,
                 req.body.description,
                 req.body.instruction,
                 req.params.id,
-                req.body.user_id,
+                req.user.user_id
             ];
 
         const delivery = req.body.delivery.split(',');
@@ -171,8 +176,7 @@ const plant_put = async (req, res, next) => {
             delivery.splice(2, 0, req.params.id);
         }
   
-        // TODO: add req.user as param after getting it from front
-        const result = await updatePlant(data, delivery, next);
+        const result = await updatePlant(data, delivery, req.user, next);
 
         if (result[0].affectedRows < 1) {
             next(httpError('No plant modified', 400));
@@ -198,10 +202,14 @@ const plant_delete = async (req, res, next) => {
             return;
         }
 
-        const data = [req.params.id, req.body.user_id];
+        const data = [req.params.id];
 
-        // TODO: add req.user as param after getting it from front
-        const result = await deletePlant(data, next);
+        // If not admin, add user_id to data
+        if (req.user.role === 1) {
+            data.push(req.user.user_id);
+        }
+
+        const result = await deletePlant(data, req.user, next);
   
         if (result.affectedRows < 1) {
             next(httpError('No plant deleted', 400));

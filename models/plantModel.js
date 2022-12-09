@@ -108,32 +108,38 @@ const addPlant = async(data, delivery, next) => {
     }
 };
 
-// TODO: add user param when getting it from front
-const updatePlant = async (data, delivery, next) => {
+const updatePlant = async (data, delivery, user, next) => {
     let connection;
-    let firstQuery;
     let firstQueryRows = [];
 
     try {
+        let firstQuery;
         connection = await promisePool.getConnection();
 
-        // TODO: if user.role === 0, can edit any plant
-        // if (user.role === 0) {
-            // firstQuery = `UPDATE plant SET name=?, price=?, description=?, instruction=?, edited=NOW()
-            // WHERE plant_id=?;`;
-        // } else {
-            // firstQuery = `UPDATE plant SET name=?, price=?, description=?, instruction=?, edited=NOW()
-            // WHERE plant_id=? AND user_id=?;`;
-        // }
-
-        firstQuery = `UPDATE plant SET name=?, price=?, description=?, instruction=?, edited=NOW()
-                      WHERE plant_id=? AND user_id=?;`;
+        // If user.role === 0, can edit any plant
+        if (user.role === 0) {
+            firstQuery = `UPDATE    plant
+                          SET       name=?, 
+                                    price=?, 
+                                    description=?, 
+                                    instruction=?, 
+                                    edited=NOW()
+                          WHERE     plant_id=?;`;
+        } else {
+            firstQuery = `UPDATE    plant 
+                          SET       name=?, 
+                                    price=?, 
+                                    description=?, 
+                                    instruction=?, 
+                                    edited=NOW()
+                          WHERE     plant_id=? AND user_id=?;`;
+        }
 
         const secondQuery = `DELETE FROM plantdelivery WHERE plant_id=?`;
 
-        // If delivery has more than two values, add one more insert
         let thirdQuery = `INSERT INTO plantdelivery(plant_id, delivery_id) VALUES(?, ?)`;
 
+        // If delivery has more than two values, add one more insert
         if (delivery.length > 2) {
             thirdQuery += `, (?, ?)`;
         }
@@ -142,11 +148,9 @@ const updatePlant = async (data, delivery, next) => {
 
         // Begin transaction
         await connection.beginTransaction();
-
         firstQueryRows = await connection.query(firstQuery, data);
         await connection.query(secondQuery, [data[4]]);
         await connection.query(thirdQuery, delivery);
-
         await connection.commit();
     } catch(e) {
         // If something went wrong, rollback so changes will be deleted
@@ -159,20 +163,18 @@ const updatePlant = async (data, delivery, next) => {
     }
 };
 
-// TODO: add user param when getting it from front
-const deletePlant = async (data, next) => {
+const deletePlant = async (data, user, next) => {
     try {
-        // TODO: if user.role === 0, admin can delete anything
-        // let sql;
-        // const params = data;
-        // if (user.role === 0) {
-            // sql = `DELETE FROM plant WHERE plant_id=?`
-        // } else {
-            // sql = `DELETE FROM plant WHERE plant_id=? AND user_id=?`
-            // params.push(user.user_id);
-        // }
+        let query;
 
-        const [rows] = await promisePool.execute(`DELETE FROM plant WHERE plant_id=? AND user_id=?`, data);
+        // If user.role === 0, can delete any plant
+        if (user.role === 0) {
+            query = `DELETE FROM plant WHERE plant_id=?`
+        } else {
+            query = `DELETE FROM plant WHERE plant_id=? AND user_id=?`
+        }
+
+        const [rows] = await promisePool.execute(query, data);
 
         return rows;
     } catch (e) {

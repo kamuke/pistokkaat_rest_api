@@ -6,11 +6,18 @@ const promisePool = pool.promise();
 
 const getAllUsers = async (next) => {
     try {
-        const [rows] = await promisePool.query(`SELECT user.user_id, user.email, user.username, municipality.name as location, COUNT(userlikes.liked_id) AS likes, user.role
-                                                FROM user
-                                                INNER JOIN municipality ON user.municipality_id = municipality.municipality_id
-                                                LEFT JOIN userlikes ON user.user_id = userlikes.liked_id
-                                                GROUP BY user.user_id;`);
+        const [rows] = await promisePool.query(`SELECT      user.user_id, 
+                                                            user.email, 
+                                                            user.username, 
+                                                            municipality.name as location, 
+                                                            COUNT(userlikes.liked_id) AS likes, 
+                                                            user.role
+                                                FROM        user
+                                                INNER JOIN  municipality 
+                                                ON          user.municipality_id = municipality.municipality_id
+                                                LEFT JOIN   userlikes 
+                                                ON          user.user_id = userlikes.liked_id
+                                                GROUP BY    user.user_id;`);
         return rows;
     } catch (e) {
         console.error('getAllUsers', e.message);
@@ -18,15 +25,24 @@ const getAllUsers = async (next) => {
     }
 };
 
-const getUser = async (userId, next) => {
+const getUser = async (data, next) => {
     try {
-        const [rows] = await promisePool.query(`SELECT user.user_id, user.email, user.username, municipality.name as location, COUNT(userlikes.liked_id) AS likes, user.role
-                                                FROM user
-                                                INNER JOIN municipality ON user.municipality_id = municipality.municipality_id
-                                                LEFT JOIN userlikes ON user.user_id = userlikes.liked_id
-                                                GROUP BY user.user_id     
-                                                HAVING user_id=?;`, [userId]);
-        return rows;
+        const [rows] = await promisePool.query(`SELECT      user.user_id, 
+                                                            user.email, 
+                                                            user.username, 
+                                                            municipality.name as location, 
+                                                            COUNT(userlikes.liked_id) AS likes,
+                                                            user.password,
+                                                            user.role
+                                                FROM        user
+                                                INNER JOIN  municipality 
+                                                ON          user.municipality_id = municipality.municipality_id
+                                                LEFT JOIN   userlikes 
+                                                ON          user.user_id = userlikes.liked_id
+                                                GROUP BY    user.user_id     
+                                                HAVING      user_id=?;`, 
+                                                data);
+        return rows.pop();
     } catch (e) {
         console.error('getUser', e.message);
         // next error handlign might not work with pass.js
@@ -36,7 +52,7 @@ const getUser = async (userId, next) => {
 
 const addUser = async (data, next) => {
     try {
-        const [rows] = await promisePool.query(`INSERT INTO user(email, username, password, municipality_id) 
+        const [rows] = await promisePool.query(`INSERT INTO user(email, username, municipality_id, password,) 
                                                 VALUES(?, ?, ?, ?);`, data);
         return rows;
     } catch (e) {
@@ -47,9 +63,22 @@ const addUser = async (data, next) => {
 
 const updateUser = async (data, next) => {
     try {
-        const [rows] = await promisePool.execute(`UPDATE user 
-                                                SET email = ?, username = ?, password = ?, municipality_id = ? 
-                                                WHERE user_id = ?;`, data);
+        let query = `UPDATE user 
+                     SET    email = ?, 
+                            username = ?, 
+                            municipality_id = ?
+                     WHERE  user_id = ?;`
+
+        if (data.length > 4) {
+            query = `UPDATE user 
+                     SET    email = ?, 
+                            username = ?, 
+                            municipality_id = ?, 
+                            password = ?
+                     WHERE  user_id = ?;`
+        }
+
+        const [rows] = await promisePool.execute(query, data);
         return rows;
     } catch (e) {
         console.error('updateUser', e.message);
@@ -57,9 +86,9 @@ const updateUser = async (data, next) => {
     }
 };
 
-const deleteUser = async (userId, next) => {
+const deleteUser = async (data, next) => {
     try {
-        const [rows] = await promisePool.execute(`DELETE FROM user WHERE user_id = ?;`, [userId]);
+        const [rows] = await promisePool.execute(`DELETE FROM user WHERE user_id = ?;`, data);
         return rows;
     } catch (e) {
         console.error('deleteUser', e.message);
@@ -67,7 +96,7 @@ const deleteUser = async (userId, next) => {
     }
 };
 
-const getUsersAllPlants = async (userId, next) => {
+const getUsersAllPlants = async (data, next) => {
     try {
         const [rows] = await promisePool.query(`SELECT 		plant.plant_id, 
                                                             plant.name, 
@@ -93,7 +122,7 @@ const getUsersAllPlants = async (userId, next) => {
                                                 LEFT JOIN 	userlikes ON user.user_id = userlikes.liked_id
                                                 GROUP BY 	plant.plant_id
                                                 HAVING 		user.user_id=?
-                                                ORDER BY 	plant.created DESC;`, [userId]);
+                                                ORDER BY 	plant.created DESC;`, data);
         return rows;
     } catch (e) {
         console.error('getUsersAllPlants', e.message);

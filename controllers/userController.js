@@ -32,14 +32,20 @@ const user_get = async (req, res, next) => {
             return;
         }
 
-        const result = await getUser(req.params.id, next);
+        let result = await getUser([req.params.id], next);
 
         if (result.length < 1) {
             next(httpError('No user found', 404));
             return;
         }
 
-        res.json(result.pop());
+        delete result.password;
+
+        if (!req.authenticated) {
+            delete result.email;
+        }
+
+        res.json(result);
     } catch (e) {
         console.error('user_get', e.message);
         next(httpError('Internal server error', 500));
@@ -75,8 +81,8 @@ const user_post = async (req, res, next) => {
         const data = [
             req.body.email,
             req.body.username,
-            req.body.password,
-            req.body.municipality_id
+            req.body.municipality_id,
+            req.body.password
         ];
 
         const result = await addUser(data, next);
@@ -109,15 +115,16 @@ const user_put = async (req, res, next) => {
         }
 
         const users = await getAllUsers(next);
+        const user = await getUser([req.user.user_id], next);
 
         // Check if email is already in use
-        if (users.find(user => user && user.email === req.body.email && user.user_id !== req.params.user_id)) {
+        if (users.find(user => user && user.email === req.body.email && user.user_id !== req.user.user_id)) {
             next(httpError('Email already in use', 400));
             return;
         }
 
         // Check if username is already in use
-        if (users.find(user => user && user.username === req.body.username && user.user_id !== req.params.user_id)) {
+        if (users.find(user => user && user.username === req.body.username && user.user_id !== req.user.user_id)) {
             next(httpError('Username already in use', 400));
             return;
         }
@@ -125,10 +132,19 @@ const user_put = async (req, res, next) => {
         const data = [
             req.body.email,
             req.body.username,
-            req.body.password,
-            req.body.municipality_id,
-            req.params.user_id
+            req.body.municipality_id
         ];
+
+        if (req.body.newPassword) {
+            // Check if password doesn't match the old password
+            if (!(user && user.password === req.body.oldPassword)) {
+                next(httpError('Wrong password', 400));
+                return;
+            }
+            data.push(req.body.newPassword);
+        }
+
+        data.push(user.user_id);
 
         const result = await updateUser(data, next);
 
@@ -182,7 +198,7 @@ const users_plant_list_get = async (req, res, next) => {
             return;
         }
 
-        let result = await getUsersAllPlants(req.params.id, next);
+        let result = await getUsersAllPlants([req.params.id], next);
 
         if (result.length < 1) {
             next(httpError('No plants found', 404));

@@ -19,8 +19,16 @@ const fileFilter = (req, file, cb) => {
 
 const upload = multer({dest: './uploads/', fileFilter});
 
+const optionalAuth = (req, res, next) => {
+    passport.authenticate('jwt', (err, user, info) => {
+        req.authenticated = !! user;
+        next();
+    })(req, res, next);
+};
+
 router.route('/').
-    get(plant_list_get).
+    get(optionalAuth,
+        plant_list_get).
     post(upload.single('image'),
         body('name').
             isLength({min: 3, max: 200}).
@@ -42,6 +50,7 @@ router.route('/').
 
 router.route('/:id').
     get(check('id').isInt(),
+        optionalAuth,
         plant_get).
     delete(check('id').isInt(),
         passport.authenticate('jwt', {session: false}),

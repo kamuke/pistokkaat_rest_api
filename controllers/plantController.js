@@ -1,6 +1,6 @@
 // plantController
 'use strict';
-const {getAllPlants, getPlant, deletePlant, addPlant, updatePlant} = require('../models/plantModel');
+const {getAllPlants, getPlant, deletePlant, addPlant, updatePlant, getUsersAllPlants} = require('../models/plantModel');
 const {httpError} = require('../utils/errors');
 const {validationResult} = require('express-validator');
 
@@ -12,9 +12,6 @@ const plant_list_get = async (req, res, next) => {
             next(httpError('No plants found', 404));
             return;
         }
-
-        console.log(req.authenticated);
-        console.log(req.user);
 
         // Iterate and return edited item: 
         // split delivery to array and add seller object to single item
@@ -67,40 +64,34 @@ const plant_get = async (req, res, next) => {
 
         let result = await getPlant(data, next);
 
-        if (result.length < 1) {
+        if (!result) {
             next(httpError('No plant found', 404));
             return;
         }
 
-        // Iterate and return edited item: 
-        // split delivery to array and add seller object to single item
-        result = result.map(item => {
-            item.delivery = item.delivery.split(',');
+        result.delivery = result.delivery.split(',');
 
-            let user = {
-                user_id: item.user_id,
-                username: item.username,
-                location: item.location,
-                likes: item.likes
-            };
+        let user = {
+            user_id: result.user_id,
+            username: result.username,
+            location: result.location,
+            likes: result.likes
+        };
 
-            // If user is authenticated, add email to user's info
-            if (req.authenticated) {
-                user.email = item.email;
-            }
+        // If user is authenticated, add email to user's info
+        if (req.authenticated) {
+            user.email = result.email;
+        }
 
-            delete item.user_id;
-            delete item.username;
-            delete item.email;
-            delete item.location;
-            delete item.likes;
+        delete result.user_id;
+        delete result.username;
+        delete result.email;
+        delete result.location;
+        delete result.likes;
 
-            item.seller = user;
+        result.seller = user;
 
-            return item;
-        });
-
-        res.json(result.pop());
+        res.json(result);
     } catch (e) {
         console.error('plant_get', e.message);
         next(httpError('Internal server error', 500));
@@ -223,10 +214,65 @@ const plant_delete = async (req, res, next) => {
     }
 };
 
+const users_plant_list_get = async (req, res, next) => {
+    try {
+        // Extract the validation errors from a request.
+        const errors = validationResult(req);
+
+        // There are errors in data
+        if (!errors.isEmpty()) {
+            console.error('user_plant_list_get validation', errors.array());
+            next(httpError('Invalid data', 400));
+            return;
+        }
+
+        let result = await getUsersAllPlants([req.params.id], next);
+
+        if (result.length < 1) {
+            next(httpError('No plants found', 404));
+            return;
+        }
+
+        // Iterate and return edited item: 
+        // split delivery to array and add seller object to single item
+        result = result.map(item => {
+            item.delivery = item.delivery.split(',');
+
+            let user = {
+                user_id: item.user_id,
+                username: item.username,
+                location: item.location,
+                likes: item.likes
+            };
+
+            // If user is authenticated, add email to user's info
+            if (req.authenticated) {
+                user.email = item.email;
+            }
+
+            delete item.user_id;
+            delete item.username;
+            delete item.email;
+            delete item.location;
+            delete item.likes;
+
+            item.seller = user;
+
+            return item;
+        });
+
+        res.json(result);
+    } catch (e) {
+        console.error('user_plant_list_get', e.message);
+        next(httpError('Internal server error', 500));
+    }
+};
+
 module.exports = {
     plant_list_get,
     plant_get,
     plant_post,
     plant_put,
     plant_delete,
+    users_plant_list_get,
 };

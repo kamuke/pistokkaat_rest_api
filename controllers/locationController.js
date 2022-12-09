@@ -23,11 +23,12 @@ const location_list_get = async (req, res, next) => {
             if (index == -1) {
                 locationsArray.push({
                     province: item.province,
-                    municipalities: [item.municipality]
+                    province_id: item.province_id,
+                    municipalities: [{municipality: item.municipality, municipality_id: item.municipality_id}]
                 });
             } else {
                 // If index was found, push item's municipality into array's index's municipality
-                locationsArray[index].municipalities.push(item.municipality);
+                locationsArray[index].municipalities.push({municipality: item.municipality, municipality_id: item.municipality_id});
             }
         });
 

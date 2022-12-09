@@ -6,6 +6,7 @@ const multer  = require('multer');
 const router = express.Router();
 const passport = require('../utils/pass');
 const {plant_list_get, plant_get, plant_post, plant_delete, plant_put} = require('../controllers/plantController');
+const {comment_list_get, comment_post, comment_delete} = require('../controllers/commentController');
 
 const fileFilter = (req, file, cb) => {
     if (file.mimetype === 'image/jpeg' || 
@@ -73,5 +74,22 @@ router.route('/:id').
         body('delivery').escape(),
         passport.authenticate('jwt', {session: false}),
         plant_put);
+
+router.route('/:id/comment').
+        get(check('id').isInt(),
+            comment_list_get).
+        post(check('id').isInt(),
+            body('comment', 'Comment must have minimum of 3 and maximum of 280 characters.').
+                isLength({min: 3, max: 280}).
+                escape(),
+            passport.authenticate('jwt', {session: false}),
+            comment_post);
+
+router.route('/:id/comment/:comment_id').
+            delete(check('id').isInt(),
+                check('comment_id').isInt(),
+                passport.authenticate('jwt', {session: false}),
+                comment_delete);
+
 
 module.exports = router;

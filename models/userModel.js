@@ -93,7 +93,17 @@ const deleteUser = async (data, next) => {
 
 const getUserLogin = async (data, next) => {
     try {
-        const [rows] = await promisePool.execute('SELECT * FROM user WHERE email = ?;', data);
+        const [rows] = await promisePool.execute(`SELECT        user.user_id, 
+                                                                user.email, 
+                                                                user.username, 
+                                                                municipality.name as location,
+                                                                user.role,
+                                                                user.password
+                                                 FROM           user
+                                                 INNER JOIN     municipality 
+                                                 ON             user.municipality_id = municipality.municipality_id
+                                                 WHERE          user.email = ?
+                                                 GROUP BY       user.user_id;`, data);
         return rows;
     } catch (e) {
         console.error('getUserLogin', e.message);

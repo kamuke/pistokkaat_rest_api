@@ -16,7 +16,7 @@ router.post('/register',
             body('municipality_id', 'Must have municipality.').
                 exists().
                 isInt(),
-            body('password', 'Password must have minimum of 8 and maximum of 80 characters, and at least one capital character.').
+            body('password', 'Password must have minimum of 8 and maximum of 80 characters, and at least one capital letter.').
                 matches(/(?=.*\p{Lu}).{8,}/u).
                 isLength({max: 80}).
                 escape(),

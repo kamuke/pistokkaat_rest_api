@@ -77,7 +77,7 @@ const favourite_post = async (req, res, next) => {
         }
 
         res.json({
-            message: 'Favourite added.'
+            message: 'Favourite added'
         });
     } catch (e) {
         console.error('favourite_post', e.message);

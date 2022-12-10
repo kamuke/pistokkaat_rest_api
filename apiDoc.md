@@ -4,6 +4,32 @@ REST API for school course
 
 ## API Reference
 
+#### Register
+
+```http
+  POST /auth/register
+```
+
+```http
+  Content-type: application/json
+```
+
+| Parameter | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `email` | `email` | **Required**, email, max length 60. Must be unique |
+| `username` | `string` | **Required**, min length 3, max length 20. Must be unique |
+| `municipality_id` | `int` | **Required**, ID of the municipality |
+| `password` | `string` | **Required**, min length 8 characters, at least one capital letter |
+
+Response:
+
+```json
+{
+  "message": "User added",
+  "user_id": 3
+}
+```
+
 #### Login
 
 ```http
@@ -34,32 +60,6 @@ Response:
 }
 ```
 
-#### Register
-
-```http
-  POST /auth/register
-```
-
-```http
-  Content-type: application/json
-```
-
-| Parameter | Type     | Description                       |
-| :-------- | :------- | :-------------------------------- |
-| `email` | `email` | **Required**, email, max length 60. Must be unique |
-| `username` | `string` | **Required**, min length 3, max length 20. Must be unique |
-| `municipality_id` | `int` | **Required**, ID of the municipality |
-| `password` | `string` | **Required**, min length 8 characters, at least one capital letter |
-
-Response:
-
-```json
-{
-  "message": "User added",
-  "user_id": 3
-}
-```
-
 #### Get all users
 
 ```http
@@ -80,7 +80,7 @@ Response:
       "username": "username",
       "location": "Helsinki",
       "role": 1
-  },
+  }
 ]
 ```
 
@@ -92,7 +92,7 @@ Response:
 
 | Parameter | Type     | Description                       |
 | :-------- | :------- | :-------------------------------- |
-| `id` | `int` | **Required**, user_id of the user to fetch. |
+| `id` | `int` | **Required**, user_id of the user to fetch |
 
 Response:
 
@@ -191,7 +191,7 @@ Response:
 }
 ```
 
-### Get user's plants
+#### Get user's plants
 
 ```http
   GET /user/id/plant
@@ -224,7 +224,7 @@ Response:
       "username": "username",
       "location": "Kerava"
     }
-  },
+  }
 ]
 ```
 
@@ -260,7 +260,7 @@ Response:
 ]
 ```
 
-### Get user's favourites
+#### Get user's favourites
 
 ```http
   GET /user/favourite
@@ -291,7 +291,7 @@ Response:
       "location": "Kerava",
       "email": "username23@mail.fi"
     }
-  },
+  }
 ]
 ```
 
@@ -321,7 +321,7 @@ Response:
             "username": "username",
             "location": "Kerava"
         }
-    },
+    }
 ]
 ```
 
@@ -348,7 +348,7 @@ Response:
             "location": "Kerava",
             "email": "username@mail.fi"
         }
-    },
+    }
 ]
 ```
 
@@ -441,7 +441,7 @@ Response:
 }
 ```
 
-#### Modify plant
+#### Update plant
 
 ```http
   PUT /plant/:id
@@ -468,7 +468,7 @@ Response:
 
 ```json
 {
-  "message": "Plant modified"
+  "message": "Plant updated"
 }
 ```
 
@@ -492,4 +492,174 @@ Response:
 {
   "message": "Plant deleted"
 }
+```
+
+#### Get plant's all comments
+
+```http
+  GET /plant/:id/comment
+```
+
+| Parameter | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `id` | `int` | **Required**, ID of the plant to get comments |
+
+Response:
+
+```json
+[
+  {
+    "comment_id": 1,
+    "user_id": 3,
+    "username": "username",
+    "created": "2022-12-10T17:33:19.000Z",
+    "comment": "Hieno kasvi!"
+  }
+]
+```
+
+#### Add comment to plant
+
+```http
+  POST /plant/:id/comment
+```
+
+```http
+  Authorization: Bearer token
+```
+
+```http
+  Content-type: application/json
+```
+
+| Parameter | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `id` | `int` | **Required**, ID of the plant to post comment |
+| `comment` | `string` | **Required**, min length 3, max length 280 |
+
+Response:
+
+```json
+{
+  "message": "Comment added"
+}
+```
+
+#### Delete comment from plant
+
+```http
+  DELETE /plant/:id/comment/:comment_id
+```
+
+```http
+  Authorization: Bearer token
+```
+
+| Parameter | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `id` | `int` | **Required**, ID of the plant to delete comment from |
+| `comment_id` | `int` | **Required**, ID of the comment to delete |
+
+Response:
+
+```json
+{
+  "message": "Comment deleted"
+}
+```
+
+#### Add plant to favourites
+
+```http
+  POST /plant/:id/favourite
+```
+
+```http
+  Authorization: Bearer token
+```
+
+| Parameter | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `id` | `int` | **Required**, ID of the plant to add it to favourites |
+
+Response:
+
+```json
+{
+  "message": "Favourite added"
+}
+```
+
+#### Delete plant from favourites
+
+```http
+  DELETE /plant/:id/favourite
+```
+
+```http
+  Authorization: Bearer token
+```
+
+| Parameter | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `id` | `int` | **Required**, ID of the plant to delete it from favourites |
+
+Response:
+
+```json
+{
+  "message": "Favourite deleted"
+}
+```
+
+#### Get all deliveries
+
+```http
+  GET /delivery
+```
+
+Response:
+
+```json
+[
+  {
+    "delivery_id": 1,
+    "name": "Nouto"
+  }
+]
+```
+
+#### Get all locations
+
+```http
+  GET /location
+```
+
+Response:
+
+```json
+[
+  {
+    "province": "Uusimaa",
+    "province_id": 1,
+    "municipalities": [
+      {
+        "municipality": "Askola",
+        "municipality_id": 1
+      },
+      {
+        "municipality": "Espoo",
+        "municipality_id": 2
+      },
+      {
+        "municipality": "Hanko",
+        "municipality_id": 3
+      },
+      {
+        "municipality": "Helsinki",
+        "municipality_id": 4
+      }
+    ]
+  }
+]
 ```

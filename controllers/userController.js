@@ -55,16 +55,6 @@ const user_get = async (req, res, next) => {
 
 const user_put = async (req, res, next) => {
     try {
-        // Extract the validation errors from a request.
-        const errors = validationResult(req);
-
-        // There are errors in data
-        if (!errors.isEmpty()) {
-            console.error('user_put validation', errors.array());
-            next(httpError(errors.array()[0].msg, 400));
-            return;
-        }
-
         const users = await getAllUsers(next);
         const user = await getUser([req.user.user_id], next);
 
@@ -80,11 +70,24 @@ const user_put = async (req, res, next) => {
             return;
         }
 
+        // Extract the validation errors from a request.
+        const errors = validationResult(req);
+
+        // There are errors in data
+        if (!errors.isEmpty()) {
+            console.error('user_put validation', errors.array());
+            next(httpError(errors.array()[0].msg, 400));
+            return;
+        }
+
         const data = [
             req.body.email,
             req.body.username,
             req.body.municipality_id
         ];
+
+        const salt = bcrypt.genSaltSync(10);
+        const password = bcrypt.hashSync(req.body.newpassword, salt);
 
         if (req.body.newpassword) {
             // Check if password doesn't match the old password
@@ -92,7 +95,7 @@ const user_put = async (req, res, next) => {
                 next(httpError('Incorrect password.', 400));
                 return;
             }
-            data.push(req.body.newpassword);
+            data.push(password);
         }
 
         data.push(user.user_id);

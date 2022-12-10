@@ -35,16 +35,6 @@ const logout = (req, res) => {
 
 const user_post = async (req, res, next) => {
     try {
-        // Extract the validation errors from a request.
-        const errors = validationResult(req);
-
-        // There are errors in data
-        if (!errors.isEmpty()) {
-            console.error('user_post validation', errors.array());
-            next(httpError(errors.array()[0].msg, 400));
-            return;
-        }
-
         const users = await getAllUsers(next);
 
         // Check if email is already in use
@@ -56,6 +46,16 @@ const user_post = async (req, res, next) => {
         // Check if username is already in use
         if (users.find(user => user && user.username === req.body.username)) {
             next(httpError('Username already in use', 400));
+            return;
+        }
+
+        // Extract the validation errors from a request.
+        const errors = validationResult(req);
+
+        // There are errors in data
+        if (!errors.isEmpty()) {
+            console.error('user_post validation', errors.array());
+            next(httpError(errors.array()[0].msg, 400));
             return;
         }
 
@@ -77,7 +77,7 @@ const user_post = async (req, res, next) => {
         }
 
         res.json({
-            message: 'User added.',
+            message: 'User added',
             user_id: result.insertId
         });
     } catch (e) {

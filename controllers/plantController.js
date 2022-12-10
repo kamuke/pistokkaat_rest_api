@@ -164,11 +164,11 @@ const plant_put = async (req, res, next) => {
         const result = await updatePlant(data, delivery, req.user, next);
 
         if (result[0].affectedRows < 1) {
-            next(httpError('No plant modified', 400));
+            next(httpError('No plant updated', 400));
             return;
         }
   
-        res.json({message: 'Plant modified',});
+        res.json({message: 'Plant updated',});
     } catch (e) {
         console.error('plant_put', e.message);
         next(httpError('Internal server error', 500));

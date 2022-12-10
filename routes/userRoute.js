@@ -28,15 +28,15 @@ router.route('/').
             withMessage('Username must have minimum of 3 and maximum of 20 characters.').
             escape(),
         body('oldpassword').
-            if((value, {req}) => req.body.newPassword).
+            if((value, {req}) => req.body.newpassword).
             if(body('newpassword').exists()).
             notEmpty().
             withMessage('Must have old password when changing it.').
-            custom((value, {req}) => value !== req.body.newPassword).
+            custom((value, {req}) => value !== req.body.newpassword).
             withMessage('Old and new passwords can not be same.').
             escape(),
-        body('newPassword').
-            if(body('newPassword').exists()).
+        body('newpassword').
+            if(body('newpassword').exists()).
             matches(/(?=.*\p{Lu}).{8,}/u).
             withMessage('Password must have minimum of 8 and maximum of 80 characters, and at least one capital character.').
             isLength({max: 80}).

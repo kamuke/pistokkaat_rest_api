@@ -87,7 +87,7 @@ router.route('/:id/comment/:comment_id').
             comment_delete);
 
 router.route('/:id/favourite').
-        get(check('id').isInt(),
+        post(check('id').isInt(),
             passport.authenticate('jwt', {session: false}),
             favourite_post).
         delete(check('id').isInt(),

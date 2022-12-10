@@ -86,13 +86,13 @@ const user_put = async (req, res, next) => {
             req.body.municipality_id
         ];
 
-        if (req.body.newPassword) {
+        if (req.body.newpassword) {
             // Check if password doesn't match the old password
-            if (!bcrypt.compareSync(req.body.oldPassword, user.password)) {
+            if (!bcrypt.compareSync(req.body.oldpassword, user.password)) {
                 next(httpError('Incorrect password.', 400));
                 return;
             }
-            data.push(req.body.newPassword);
+            data.push(req.body.newpassword);
         }
 
         data.push(user.user_id);
@@ -100,7 +100,7 @@ const user_put = async (req, res, next) => {
         const result = await updateUser(data, next);
 
         if (result.affectedRows < 1) {
-            next(httpError('No user modified', 400));
+            next(httpError('No user updated', 400));
             return;
         }
 
@@ -123,7 +123,7 @@ const user_delete = async (req, res, next) => {
             return;
         }
 
-        const result = await deleteUser(req.params.id, next);
+        const result = await deleteUser(req.user.user_id, next);
 
         if (result.affectedRows < 1) {
             next(httpError('No user deleted', 400));

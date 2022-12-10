@@ -27,9 +27,9 @@ router.route('/').
             isLength({min: 3, max: 20}).
             withMessage('Username must have minimum of 3 and maximum of 20 characters.').
             escape(),
-        body('oldPassword').
+        body('oldpassword').
             if((value, {req}) => req.body.newPassword).
-            if(body('newPassword').exists()).
+            if(body('newpassword').exists()).
             notEmpty().
             withMessage('Must have old password when changing it.').
             custom((value, {req}) => value !== req.body.newPassword).
@@ -43,7 +43,9 @@ router.route('/').
             escape(),
         body('municipality_id').isInt(),
         passport.authenticate('jwt', {session: false}),
-        user_put);
+        user_put).
+    delete(passport.authenticate('jwt', {session: false}),
+        user_delete);
 
 router.get('/token', check_token);
 
@@ -53,10 +55,7 @@ router.route('/favourite').
 router.route('/:id').
     get(check('id').isInt(),
         optionalAuth,
-        user_get).
-    delete(check('id').isInt(),
-        passport.authenticate('jwt', {session: false}),
-        user_delete);
+        user_get);
 
 router.route('/:id/plant').
     get(check('id').isInt(),

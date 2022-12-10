@@ -168,7 +168,7 @@ const plant_put = async (req, res, next) => {
             return;
         }
   
-        res.json({message: 'Plant updated',});
+        res.json({message: 'Plant modified',});
     } catch (e) {
         console.error('plant_put', e.message);
         next(httpError('Internal server error', 500));

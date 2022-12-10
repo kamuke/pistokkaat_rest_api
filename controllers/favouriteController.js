@@ -18,6 +18,8 @@ const favourite_list_get = async (req, res, next) => {
 
         let result = await getFavourites([req.user.user_id]);
 
+        console.log(result);
+
         if (result.length < 1) {
             next(httpError('No favourites found', 404));
             return;

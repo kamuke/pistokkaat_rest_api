@@ -11,10 +11,9 @@ const plant_list_get = async (req, res, next) => {
 
         let result = await getAllPlants(next);
 
-        //filter by params TODO: make this look nicer?
+        //filter by params
         if(nimi) {
-            //TODO: ignore case sensitivity in front?
-            result = result.filter(r => r.name === nimi);
+            result = result.filter(r => new RegExp(nimi, 'i').test(r.name));
         }
         if(hinta){
             result = result.filter(r => +r.price === +hinta);

@@ -4,7 +4,6 @@ const pool = require('../database/db');
 const {httpError} = require('../utils/errors');
 const promisePool = pool.promise();
 
-// TODO: search in this same get?
 const getAllPlants = async (next) => {
     try {
         const [rows] = await promisePool.query(`SELECT 		plant.plant_id, 

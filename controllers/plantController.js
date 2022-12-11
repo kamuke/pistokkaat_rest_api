@@ -6,7 +6,25 @@ const {validationResult} = require('express-validator');
 
 const plant_list_get = async (req, res, next) => {
     try {
+        //create query params
+        const { nimi, hinta, toimitus, sijainti } = req.query;
+
         let result = await getAllPlants(next);
+
+        //filter by params TODO: make this look nicer?
+        if(nimi) {
+            //TODO: ignore case sensitivity in front?
+            result = result.filter(r => r.name === nimi);
+        }
+        if(hinta){
+            result = result.filter(r => +r.price === +hinta);
+        }
+        if(toimitus){
+            result = result.filter(r => r.delivery === toimitus);
+        }
+        if(sijainti){
+            result = result.filter(r => r.location === sijainti);
+        }
 
         if (result.length < 1) {
             next(httpError('No plants found', 404));

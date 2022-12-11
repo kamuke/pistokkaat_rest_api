@@ -11,7 +11,7 @@ const login = (req, res, next) => {
         console.log('info: ', info);
         console.log('err1', err);
         if (err || !user) {
-            next(httpError('Login failed', 403));
+            next(httpError('Väärä sähköposti tai salasana.', 403));
             return;
         }
 
@@ -39,13 +39,13 @@ const user_post = async (req, res, next) => {
 
         // Check if email is already in use
         if (users.find(user => user && user.email === req.body.email)) {
-            next(httpError('Email already in use', 400));
+            next(httpError('Sähköposti on jo käytössä.', 400));
             return;
         }
 
         // Check if username is already in use
         if (users.find(user => user && user.username === req.body.username)) {
-            next(httpError('Username already in use', 400));
+            next(httpError('Käyttäjätunnus on jo käytössä.', 400));
             return;
         }
 
@@ -65,19 +65,19 @@ const user_post = async (req, res, next) => {
         const data = [
             req.body.email,
             req.body.username,
-            req.body.municipality_id,
+            req.body.municipality,
             password
         ];
 
         const result = await addUser(data, next);
 
         if (result.affectedRows < 1) {
-            next(httpError('Invalid data', 400));
+            next(httpError('Virheellistä tietoa.', 400));
             return;
         }
 
         res.json({
-            message: 'User added',
+            message: 'Käyttäjä lisätty onnistuneesti.',
             user_id: result.insertId
         });
     } catch (e) {

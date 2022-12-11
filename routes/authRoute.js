@@ -7,16 +7,16 @@ const {login, logout, user_post} = require('../controllers/authController');
 router.post('/login', login);
 router.get('/logout', logout);
 router.post('/register',
-            body('email', 'Email must be valid email and maximum of 60 characters.').           
+            body('email', 'Sähköpostin tulee olla toimiva ja maksimissaan 60 merkkiä.').           
                 isEmail().
                 isLength({max: 60}).
                 normalizeEmail(),
-            body('username', 'Username must have minimum of 3 and maximum of 20 characters.').
+            body('username', 'Käyttäjänimen tulee olla vähintään 3 ja maksimissaan 20 merkkiä.').
                 isLength({min: 3, max: 20}).
                 escape(),
-            body('municipality_id', 'Must have municipality.').
+            body('municipality', 'Must have municipality.').
                 isInt(),
-            body('password', 'Password must have minimum of 8 and maximum of 80 characters, and at least one capital letter.').
+            body('password', 'Salasanan tulee olla vähintään 8 ja maksimissaan 80 merkkiä, ja salasanassa tulee olla vähintään 1 iso kirjain.').
                 matches(/(?=.*\p{Lu}).{8,}/u).
                 isLength({max: 80}).
                 escape(),

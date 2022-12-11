@@ -41,7 +41,7 @@ router.route('/').
             withMessage('Password must have minimum of 8 and maximum of 80 characters, and at least one capital character.').
             isLength({max: 80}).
             escape(),
-        body('municipality_id').isInt(),
+        body('municipality').isInt(),
         passport.authenticate('jwt', {session: false}),
         user_put).
     delete(passport.authenticate('jwt', {session: false}),

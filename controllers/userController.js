@@ -83,7 +83,7 @@ const user_put = async (req, res, next) => {
         const data = [
             req.body.email,
             req.body.username,
-            req.body.municipality_id
+            req.body.municipality
         ];
 
         const salt = bcrypt.genSaltSync(10);

@@ -437,7 +437,7 @@ Response:
 ```json
 {
   "message": "Plant added",
-  "id": 2
+  "plant_id": 2
 }
 ```
 

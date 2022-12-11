@@ -28,7 +28,7 @@ app.use('/delivery', deliveryRoute);
 app.use('/location', locationRoute);
 
 app.use((req, res, next) => {
-    const err = httpError('Not found2', 404);
+    const err = httpError('Ei löytynyt.', 404);
     next(err);
 });
 

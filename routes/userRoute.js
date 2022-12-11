@@ -47,7 +47,9 @@ router.route('/').
     delete(passport.authenticate('jwt', {session: false}),
         user_delete);
 
-router.get('/token', check_token);
+router.get('/token',
+        passport.authenticate('jwt', {session: false}),
+        check_token);
 
 router.route('/favourite').
     get(passport.authenticate('jwt', {session: false}), favourite_list_get);

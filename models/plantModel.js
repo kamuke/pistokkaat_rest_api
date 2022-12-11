@@ -13,24 +13,33 @@ const getAllPlants = async (next) => {
                                                             plant.description, 
                                                             plant.instruction, 
                                                             plant.imagename, 
-                                                            GROUP_CONCAT(DISTINCT delivery.name ORDER BY delivery.name ASC) AS delivery,
-                                                            COUNT(plantfavourites.plant_id) AS favourites, 
+                                                            GROUP_CONCAT(
+                                                                DISTINCT delivery.name 
+                                                                ORDER BY delivery.name ASC 
+                                                                SEPARATOR ', '
+                                                            ) AS delivery,
+                                                            (
+                                                                SELECT COUNT(plant_id) 
+                                                                FROM plantfavourites 
+                                                                WHERE plant_id = plant.plant_id
+                                                            ) AS favourites,
                                                             plant.created, 
                                                             plant.edited, 
                                                             user.user_id, 
                                                             user.username, 
                                                             user.email, 
-                                                            municipality.name AS location,
-                                                            COUNT(userlikes.liked_id) AS likes
-                                                FROM 		plant
-                                                INNER JOIN 	user ON plant.user_id = user.user_id
-                                                INNER JOIN 	municipality ON user.municipality_id = municipality.municipality_id
-                                                INNER JOIN 	plantdelivery ON plant.plant_id = plantdelivery.plant_id
-                                                INNER JOIN 	delivery ON plantdelivery.delivery_id = delivery.delivery_id
-                                                LEFT JOIN 	plantfavourites ON plant.plant_id = plantfavourites.plant_id
-                                                LEFT JOIN 	userlikes ON user.user_id = userlikes.liked_id
-                                                GROUP BY 	plant.plant_id
-                                                ORDER BY 	plant.created DESC;`);
+                                                            municipality.name AS location
+                                              FROM 			plant
+                                              INNER JOIN 	user 
+                                              ON            plant.user_id = user.user_id
+                                              INNER JOIN 	municipality 
+                                              ON            user.municipality_id = municipality.municipality_id
+                                              INNER JOIN 	plantdelivery
+                                              ON            plant.plant_id = plantdelivery.plant_id
+                                              INNER JOIN 	delivery 
+                                              ON            plantdelivery.delivery_id = delivery.delivery_id
+                                              GROUP BY 	    plant.plant_id
+                                              ORDER BY 	    plant.created DESC;`);
         return rows;
     } catch (e) {
         console.error('getAllPlants', e.message);
@@ -38,7 +47,7 @@ const getAllPlants = async (next) => {
     }
 };
 
-const getPlant = async (plantId, next) => {
+const getPlant = async (data, next) => {
     try {
         const [rows] = await promisePool.query(`SELECT 		plant.plant_id, 
                                                             plant.name, 
@@ -46,37 +55,43 @@ const getPlant = async (plantId, next) => {
                                                             plant.description, 
                                                             plant.instruction, 
                                                             plant.imagename, 
-                                                            GROUP_CONCAT(DISTINCT delivery.name ORDER BY delivery.name ASC) AS delivery,
-                                                            COUNT(plantfavourites.plant_id) AS favourites, 
+                                                            GROUP_CONCAT(
+                                                                DISTINCT delivery.name 
+                                                                ORDER BY delivery.name ASC 
+                                                                SEPARATOR ', '
+                                                            ) AS delivery,
+                                                            (
+                                                                SELECT COUNT(plant_id) 
+                                                                FROM plantfavourites 
+                                                                WHERE plant_id = plant.plant_id
+                                                            ) AS favourites,
                                                             plant.created, 
                                                             plant.edited, 
                                                             user.user_id, 
                                                             user.username, 
                                                             user.email, 
-                                                            municipality.name AS location,
-                                                            COUNT(userlikes.liked_id) AS likes
+                                                            municipality.name AS location
                                                 FROM 		plant
                                                 INNER JOIN 	user ON plant.user_id = user.user_id
                                                 INNER JOIN 	municipality ON user.municipality_id = municipality.municipality_id
                                                 INNER JOIN 	plantdelivery ON plant.plant_id = plantdelivery.plant_id
                                                 INNER JOIN 	delivery ON plantdelivery.delivery_id = delivery.delivery_id
-                                                LEFT JOIN 	plantfavourites ON plant.plant_id = plantfavourites.plant_id
-                                                LEFT JOIN 	userlikes ON user.user_id = userlikes.liked_id
-                                                GROUP BY 	plant.plant_id
-                                                HAVING 	 	plant.plant_id = ?;`, [plantId]);
-        return rows;
+                                                WHERE       plant.plant_id = ?
+                                                GROUP BY 	plant.plant_id;`, data);
+        return rows.pop();
     } catch (e) {
         console.error('getPlant', e.message);
         next(httpError('Database error', 500));
     }
 };
 
-// TODO: Only logged users can add plants
 const addPlant = async(data, delivery, next) => {
-    const connection = await promisePool.getConnection();
+    let connection;
     let firstQueryRows = [];
 
     try {
+        connection = await promisePool.getConnection();
+
         const firstQuery = `INSERT INTO plant(name, price, imagename, description, instruction, user_id) 
                    VALUES(?, ?, ?, ?, ?, ?);`;
 
@@ -107,20 +122,38 @@ const addPlant = async(data, delivery, next) => {
     }
 };
 
-// TODO: users can only update own plants, except admins.
-const updatePlant = async (data, delivery, next) => {
-    const connection = await promisePool.getConnection();
+const updatePlant = async (data, delivery, user, next) => {
+    let connection;
     let firstQueryRows = [];
 
     try {
-        const firstQuery = `UPDATE plant SET name=?, price=?, description=?, instruction=?, edited=NOW()
-                          WHERE plant_id=?;`;
+        let firstQuery;
+        connection = await promisePool.getConnection();
+
+        // If user.role === 0, can edit any plant
+        if (user.role === 0) {
+            firstQuery = `UPDATE    plant
+                          SET       name=?, 
+                                    price=?, 
+                                    description=?, 
+                                    instruction=?, 
+                                    edited=NOW()
+                          WHERE     plant_id=?;`;
+        } else {
+            firstQuery = `UPDATE    plant 
+                          SET       name=?, 
+                                    price=?, 
+                                    description=?, 
+                                    instruction=?, 
+                                    edited=NOW()
+                          WHERE     plant_id=? AND user_id=?;`;
+        }
 
         const secondQuery = `DELETE FROM plantdelivery WHERE plant_id=?`;
 
-        // If delivery has more than two values, add one more insert
         let thirdQuery = `INSERT INTO plantdelivery(plant_id, delivery_id) VALUES(?, ?)`;
 
+        // If delivery has more than two values, add one more insert
         if (delivery.length > 2) {
             thirdQuery += `, (?, ?)`;
         }
@@ -129,11 +162,9 @@ const updatePlant = async (data, delivery, next) => {
 
         // Begin transaction
         await connection.beginTransaction();
-
         firstQueryRows = await connection.query(firstQuery, data);
         await connection.query(secondQuery, [data[4]]);
         await connection.query(thirdQuery, delivery);
-
         await connection.commit();
     } catch(e) {
         // If something went wrong, rollback so changes will be deleted
@@ -146,13 +177,61 @@ const updatePlant = async (data, delivery, next) => {
     }
 };
 
-// TODO: users can only delete own plants, except admins.
-const deletePlant = async (plantId, next) => {
+const deletePlant = async (data, user, next) => {
     try {
-        const [rows] = await promisePool.execute(`DELETE FROM plant WHERE plant_id=?`, [plantId]);
+        let query;
+
+        // If user.role === 0, can delete any plant
+        if (user.role === 0) {
+            query = `DELETE FROM plant WHERE plant_id=?`
+        } else {
+            query = `DELETE FROM plant WHERE plant_id=? AND user_id=?`
+        }
+
+        const [rows] = await promisePool.execute(query, data);
+
         return rows;
     } catch (e) {
         console.error('deletePlant', e.message);
+        next(httpError('Database error', 500));
+    }
+};
+
+const getUsersAllPlants = async (data, next) => {
+    try {
+        const [rows] = await promisePool.query(`SELECT 		plant.plant_id, 
+                                                            plant.name, 
+                                                            plant.price, 
+                                                            plant.description, 
+                                                            plant.instruction, 
+                                                            plant.imagename, 
+                                                            GROUP_CONCAT(
+                                                                DISTINCT delivery.name 
+                                                                ORDER BY delivery.name ASC
+                                                                SEPARATOR ', '
+                                                            ) AS delivery,
+                                                            (
+                                                                SELECT COUNT(plant_id) 
+                                                                FROM plantfavourites 
+                                                                WHERE plant_id = plant.plant_id
+                                                            ) AS favourites,
+                                                            plant.created, 
+                                                            plant.edited, 
+                                                            user.user_id, 
+                                                            user.username, 
+                                                            user.email, 
+                                                            municipality.name AS location
+                                                FROM 		plant
+                                                INNER JOIN 	user ON plant.user_id = user.user_id
+                                                INNER JOIN 	municipality ON user.municipality_id = municipality.municipality_id
+                                                INNER JOIN 	plantdelivery ON plant.plant_id = plantdelivery.plant_id
+                                                INNER JOIN 	delivery ON plantdelivery.delivery_id = delivery.delivery_id
+                                                WHERE		user.user_id=?
+                                                GROUP BY 	plant.plant_id
+                                                ORDER BY 	plant.created DESC`, data);
+        return rows;
+    } catch (e) {
+        console.error('getUsersAllPlants', e.message);
         next(httpError('Database error', 500));
     }
 };
@@ -163,4 +242,5 @@ module.exports = {
     addPlant,
     updatePlant,
     deletePlant,
+    getUsersAllPlants,
 };

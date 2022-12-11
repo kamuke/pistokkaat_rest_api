@@ -1,6 +1,6 @@
 // plantController
 'use strict';
-const {getAllPlants, getPlant, deletePlant, addPlant, updatePlant} = require('../models/plantModel');
+const {getAllPlants, getPlant, deletePlant, addPlant, updatePlant, getUsersAllPlants} = require('../models/plantModel');
 const {httpError} = require('../utils/errors');
 const {validationResult} = require('express-validator');
 
@@ -13,18 +13,19 @@ const plant_list_get = async (req, res, next) => {
             return;
         }
 
-        // Iterate and return edited item: 
-        // split delivery to array and add seller object to single item
+        // Iterate and return edited item: add seller object to single item
         result = result.map(item => {
-            item.delivery = item.delivery.split(',');
 
             let user = {
                 user_id: item.user_id,
                 username: item.username,
-                email: item.email,
-                location: item.location,
-                likes: item.likes
+                location: item.location
             };
+
+            // If user is authenticated, add email to user's info
+            if (req.authenticated) {
+                user.email = item.email;
+            }
 
             delete item.user_id;
             delete item.username;
@@ -56,50 +57,43 @@ const plant_get = async (req, res, next) => {
             return;
         }
 
-        let result = await getPlant(req.params.id, next);
+        const data =  [req.params.id];
 
-        if (result.length < 1) {
+        let result = await getPlant(data, next);
+
+        if (!result) {
             next(httpError('No plant found', 404));
             return;
         }
 
-        // Iterate and return edited item: 
-        // split delivery to array and add seller object to single item
-        result = result.map(item => {
-            item.delivery = item.delivery.split(',');
+        let user = {
+            user_id: result.user_id,
+            username: result.username,
+            location: result.location
+        };
 
-            let user = {
-                user_id: item.user_id,
-                username: item.username,
-                email: item.email,
-                location: item.location,
-                likes: item.likes
-            };
+        // If user is authenticated, add email to user's info
+        if (req.authenticated) {
+            user.email = result.email;
+        }
 
-            delete item.user_id;
-            delete item.username;
-            delete item.email;
-            delete item.location;
-            delete item.likes;
+        delete result.user_id;
+        delete result.username;
+        delete result.email;
+        delete result.location;
+        delete result.likes;
 
-            item.seller = user;
+        result.seller = user;
 
-            return item;
-        });
-
-        res.json(result.pop());
+        res.json(result);
     } catch (e) {
         console.error('plant_get', e.message);
         next(httpError('Internal server error', 500));
     }
 };
 
-// TODO: should receive deliverys as an array from front
-// have to change in front side so that the form posts delivery input as array? Maybe? not sure 
 const plant_post = async (req, res, next) => {
     try {
-
-        console.log(req.body);
         // Extract the validation errors from a request.
         const errors = validationResult(req);
 
@@ -116,7 +110,7 @@ const plant_post = async (req, res, next) => {
             req.file.filename,
             req.body.description,
             req.body.instruction,
-            req.body.seller_id
+            req.user.user_id
         ]
 
         const delivery = req.body.delivery.split(',');
@@ -151,25 +145,26 @@ const plant_put = async (req, res, next) => {
         }
 
         const data = [
-            req.body.name,
-            req.body.price,
-            req.body.description,
-            req.body.instruction,
-            req.body.plant_id
-        ];
+                req.body.name,
+                req.body.price,
+                req.body.description,
+                req.body.instruction,
+                req.params.id,
+                req.user.user_id
+            ];
 
         const delivery = req.body.delivery.split(',');
-        delivery.splice(0, 0, req.body.plant_id); // Delivery also needs plant's id to insert data
+        delivery.splice(0, 0, req.params.id); // Delivery also needs plant's id to insert data
 
         // If there is more than one delivery option, add another plant's id
         if (delivery.length > 2) {
-            delivery.splice(2, 0, req.body.plant_id);
+            delivery.splice(2, 0, req.params.id);
         }
   
-        const result = await updatePlant(data, delivery, next);
+        const result = await updatePlant(data, delivery, req.user, next);
 
         if (result[0].affectedRows < 1) {
-            next(httpError('No plant modified', 400));
+            next(httpError('No plant updated', 400));
             return;
         }
   
@@ -192,7 +187,14 @@ const plant_delete = async (req, res, next) => {
             return;
         }
 
-        const result = await deletePlant(req.params.id, next);
+        const data = [req.params.id];
+
+        // If not admin, add user_id to data
+        if (req.user.role === 1) {
+            data.push(req.user.user_id);
+        }
+
+        const result = await deletePlant(data, req.user, next);
   
         if (result.affectedRows < 1) {
             next(httpError('No plant deleted', 400));
@@ -206,10 +208,65 @@ const plant_delete = async (req, res, next) => {
     }
 };
 
+const users_plant_list_get = async (req, res, next) => {
+    try {
+        // Extract the validation errors from a request.
+        const errors = validationResult(req);
+
+        // There are errors in data
+        if (!errors.isEmpty()) {
+            console.error('user_plant_list_get validation', errors.array());
+            next(httpError('Invalid data', 400));
+            return;
+        }
+
+        let result = await getUsersAllPlants([req.params.id], next);
+
+        if (result.length < 1) {
+            next(httpError('No plants found', 404));
+            return;
+        }
+
+        // Iterate and return edited item: 
+        // split delivery to array and add seller object to single item
+        result = result.map(item => {
+            item.delivery = item.delivery.split(',');
+
+            let user = {
+                user_id: item.user_id,
+                username: item.username,
+                location: item.location,
+                likes: item.likes
+            };
+
+            // If user is authenticated, add email to user's info
+            if (req.authenticated) {
+                user.email = item.email;
+            }
+
+            delete item.user_id;
+            delete item.username;
+            delete item.email;
+            delete item.location;
+            delete item.likes;
+
+            item.seller = user;
+
+            return item;
+        });
+
+        res.json(result);
+    } catch (e) {
+        console.error('user_plant_list_get', e.message);
+        next(httpError('Internal server error', 500));
+    }
+};
+
 module.exports = {
     plant_list_get,
     plant_get,
     plant_post,
     plant_put,
     plant_delete,
+    users_plant_list_get,
 };

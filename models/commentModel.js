@@ -19,7 +19,7 @@ const getComments = async (data, next) => {
         return rows;
     } catch (e) {
         console.error('getComments', e.message);
-        next(httpError('Database error', 500));
+        next(httpError('Virhe tietokannassa.', 500));
     }
 };
 
@@ -30,7 +30,7 @@ const addComment = async (data, next) => {
         return rows;
     } catch (e) {
         console.error('addComment', e.message);
-        next(httpError('Database error', 500));
+        next(httpError('Virhe tietokannassa.', 500));
     }
 }
 
@@ -50,7 +50,7 @@ const deleteComment = async (data, user, next) => {
         return rows;
     } catch (e) {
         console.error('deleteComment', e.message);
-        next(httpError('Database error', 500));
+        next(httpError('Virhe tietokannassa.', 500));
     }
 }
 

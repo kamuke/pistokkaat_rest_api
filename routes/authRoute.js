@@ -14,7 +14,7 @@ router.post('/register',
             body('username', 'Käyttäjänimen tulee olla vähintään 3 ja maksimissaan 20 merkkiä.').
                 isLength({min: 3, max: 20}).
                 escape(),
-            body('municipality', 'Must have municipality.').
+            body('municipality', 'Lisää kunta.').
                 isInt(),
             body('password', 'Salasanan tulee olla vähintään 8 ja maksimissaan 80 merkkiä, ja salasanassa tulee olla vähintään 1 iso kirjain.').
                 matches(/(?=.*\p{Lu}).{8,}/u).

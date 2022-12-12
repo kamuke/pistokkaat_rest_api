@@ -18,7 +18,7 @@ const getAllUsers = async (next) => {
         return rows;
     } catch (e) {
         console.error('getAllUsers', e.message);
-        next(httpError('Database error', 500));
+        next(httpError('Virhe tietokannassa.', 500));
     }
 };
 
@@ -40,7 +40,7 @@ const getUser = async (data, next) => {
     } catch (e) {
         console.error('getUser', e.message);
         // next error handlign might not work with pass.js
-        // next(httpError('Database error', 500));
+        // next(httpError('Virhe tietokannassa.', 500));
     }
 };
 
@@ -52,7 +52,7 @@ const addUser = async (data, next) => {
         return rows;
     } catch (e) {
         console.error('addUser', e.message);
-        next(httpError('Database error', 500));
+        next(httpError('Virhe tietokannassa.', 500));
     }
 };
 
@@ -77,7 +77,7 @@ const updateUser = async (data, next) => {
         return rows;
     } catch (e) {
         console.error('updateUser', e.message);
-        next(httpError('Database error', 500));
+        next(httpError('Virhe tietokannassa.', 500));
     }
 };
 
@@ -87,7 +87,7 @@ const deleteUser = async (data, next) => {
         return rows;
     } catch (e) {
         console.error('deleteUser', e.message);
-        next(httpError('Database error', 500));
+        next(httpError('Virhe tietokannassa.', 500));
     }
 };
 
@@ -107,7 +107,7 @@ const getUserLogin = async (data, next) => {
         return rows;
     } catch (e) {
         console.error('getUserLogin', e.message);
-        next(httpError('Database error', 500));
+        next(httpError('Virhe tietokannassa.', 500));
     }
   };
 

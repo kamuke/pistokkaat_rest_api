@@ -82,7 +82,7 @@ const user_post = async (req, res, next) => {
         });
     } catch (e) {
         console.error('user_post', e.message);
-        next(httpError('Internal server error', 500));
+        next(httpError('Sisäinen palvelinvirhe.', 500));
     }
 };
 

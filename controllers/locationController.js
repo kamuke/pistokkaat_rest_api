@@ -8,7 +8,7 @@ const location_list_get = async (req, res, next) => {
         const result = await getAllLocations(next);
 
         if (result.length < 1) {
-            next(httpError('No locations found', 404));
+            next(httpError('Sijainteja ei löytynyt.', 404));
             return;
         }
 
@@ -35,7 +35,7 @@ const location_list_get = async (req, res, next) => {
         res.json(locationsArray);
     } catch (e) {
         console.error('location_list_get', e.message);
-        next(httpError('Internal server error', 500));
+        next(httpError('Sisäinen palvelinvirhe.', 500));
     }
 };
 

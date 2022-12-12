@@ -20,28 +20,29 @@ router.route('/').
         user_list_get).
     put(body('email').
             isEmail().
-            withMessage('Email must be valid email and maximum of 60 characters.').
+            withMessage('Sähköpostin tulee olla toimiva ja maksimissaan 60 merkkiä.').
             normalizeEmail().
             isLength({max: 60}),
         body('username').
             isLength({min: 3, max: 20}).
-            withMessage('Username must have minimum of 3 and maximum of 20 characters.').
+            withMessage('Käyttäjänimen tulee olla vähintään 3 ja maksimissaan 20 merkkiä.').
             escape(),
         body('oldpassword').
             if((value, {req}) => req.body.newpassword).
             if(body('newpassword').exists()).
             notEmpty().
-            withMessage('Must have old password when changing it.').
+            withMessage('Lisää vanha salasana, kun vaihdat salasanaa.').
             custom((value, {req}) => value !== req.body.newpassword).
-            withMessage('Old and new passwords can not be same.').
+            withMessage('Uusi ja vanha salasana eivät voi olla sama.').
             escape(),
         body('newpassword').
             if(body('newpassword').exists()).
             matches(/(?=.*\p{Lu}).{8,}/u).
-            withMessage('Password must have minimum of 8 and maximum of 80 characters, and at least one capital character.').
+            withMessage('Salasanan tulee olla vähintään 8 ja maksimissaan 80 merkkiä, ja salasanassa tulee olla vähintään 1 iso kirjain.').
             isLength({max: 80}).
             escape(),
-        body('municipality').isInt(),
+        body('municipality', 'Lisää kunta.').
+            isInt(),
         passport.authenticate('jwt', {session: false}),
         user_put).
     delete(passport.authenticate('jwt', {session: false}),

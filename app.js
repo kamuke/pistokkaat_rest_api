@@ -29,13 +29,13 @@ app.use('/delivery', deliveryRoute);
 app.use('/location', locationRoute);
 
 app.use((req, res, next) => {
-    const err = httpError('Ei löytynyt.', 404);
+    const err = httpError('Sivua ei löytynyt.', 404);
     next(err);
 });
 
 app.use((err, req, res, next) => {
     res.status(err.status || 500).
-        json({message: err.message || 'Internal server error'});
+        json({message: err.message || 'Sisäinen palvelinvirhe.'});
 });
 
 app.listen(port, () => {

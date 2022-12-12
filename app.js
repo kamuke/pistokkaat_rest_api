@@ -20,6 +20,7 @@ app.use(express.urlencoded({ extended: true })); // For parsing application/x-ww
 app.use(passport.initialize());
 
 app.use(express.static('uploads'));
+app.use('/thumbnails', express.static('thumbnails'));
 
 app.use('/auth', authRoute);
 app.use('/plant', plantRoute);

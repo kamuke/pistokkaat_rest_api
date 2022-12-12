@@ -2,6 +2,7 @@
 'use strict';
 const {getAllPlants, getPlant, deletePlant, addPlant, updatePlant, getUsersAllPlants} = require('../models/plantModel');
 const {httpError} = require('../utils/errors');
+const sharp = require('sharp');
 const {validationResult} = require('express-validator');
 
 const plant_list_get = async (req, res, next) => {
@@ -104,6 +105,11 @@ const plant_post = async (req, res, next) => {
             return;
         }
 
+        const thumbnail = await sharp(req.file.path).
+                        resize(160, 220).
+                        png().
+                        toFile('./thumbnails/' + req.file.filename);
+
         const data = [
             req.body.name,
             req.body.price,
@@ -122,10 +128,12 @@ const plant_post = async (req, res, next) => {
             return;
         }
 
-        res.json({
-            message: 'Plant added.',
-            plant_id: result[0].insertId,
-        });
+        if (thumbnail) {
+            res.json({
+                message: 'Plant added.',
+                plant_id: result[0].insertId,
+            });
+        }
     } catch (e) {
         console.error('plant_post', e.message);
         next(httpError('Internal server error', 500));

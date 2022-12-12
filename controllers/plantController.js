@@ -1,29 +1,23 @@
 // plantController
 'use strict';
-const {getAllPlants, getPlant, deletePlant, addPlant, updatePlant, getUsersAllPlants, getMaxAmountOfPlants} = require('../models/plantModel');
+const {getAllPlants, getPlant, deletePlant, addPlant, updatePlant, getUsersAllPlants} = require('../models/plantModel');
 const {httpError} = require('../utils/errors');
 const {validationResult} = require('express-validator');
 
 const plant_list_get = async (req, res, next) => {
     try {
-        //create query params
-        const { nimi, hinta, toimitus, sijainti } = req.query;
 
-        let result = await getAllPlants(next);
+        // Extract the validation errors from a request.
+        const errors = validationResult(req);
 
-        //filter by params
-        if(nimi) {
-            result = result.filter(r => new RegExp(nimi, 'i').test(r.name));
+        // There are errors in data
+        if (!errors.isEmpty()) {
+            console.error('plant_get validation', errors.array());
+            next(httpError('Invalid data', 400));
+            return;
         }
-        if(hinta){
-            result = result.filter(r => +r.price === +hinta);
-        }
-        if(toimitus){
-            result = result.filter(r => r.delivery === toimitus);
-        }
-        if(sijainti){
-            result = result.filter(r => r.location === sijainti);
-        }
+
+        let result = await getAllPlants(next, req.query);
 
         if (result.length < 1) {
             next(httpError('No plants found', 404));
@@ -61,47 +55,6 @@ const plant_list_get = async (req, res, next) => {
         next(httpError('Internal server error', 500));
     }
 };
-
-const plant_amount_get = async (req, res, next) => {
-    try {
-        let result = await getMaxAmountOfPlants(next);
-
-        if (!result) {
-            next(httpError('No plant found', 404));
-            return;
-        }
-
-        // Iterate and return edited item: add seller object to single item
-        result = result.map(item => {
-
-            let user = {
-                user_id: item.user_id,
-                username: item.username,
-                location: item.location
-            };
-
-            // If user is authenticated, add email to user's info
-            if (req.authenticated) {
-                user.email = item.email;
-            }
-
-            delete item.user_id;
-            delete item.username;
-            delete item.email;
-            delete item.location;
-            delete item.likes;
-
-            item.seller = user;
-
-            return item;
-        });
-
-        res.json(result);
-    } catch (e) {
-        console.error('plant_amount_get', e.message);
-        next(httpError('Internal server error', 500));
-    }
-}
 
 const plant_get = async (req, res, next) => {
     try {
@@ -327,5 +280,4 @@ module.exports = {
     plant_put,
     plant_delete,
     users_plant_list_get,
-    plant_amount_get,
 };

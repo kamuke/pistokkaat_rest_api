@@ -4,85 +4,97 @@ const pool = require('../database/db');
 const {httpError} = require('../utils/errors');
 const promisePool = pool.promise();
 
-const getAllPlants = async (next) => {
+const getAllPlants = async (next, query) => {
     try {
-        const [rows] = await promisePool.query(`SELECT 		plant.plant_id, 
-                                                            plant.name, 
-                                                            plant.price, 
-                                                            plant.description, 
-                                                            plant.instruction, 
-                                                            plant.imagename, 
-                                                            GROUP_CONCAT(
-                                                                DISTINCT delivery.name 
-                                                                ORDER BY delivery.name ASC 
-                                                                SEPARATOR ', '
-                                                            ) AS delivery,
-                                                            (
-                                                                SELECT COUNT(plant_id) 
-                                                                FROM plantfavourites 
-                                                                WHERE plant_id = plant.plant_id
-                                                            ) AS favourites,
-                                                            plant.created, 
-                                                            plant.edited, 
-                                                            user.user_id, 
-                                                            user.username, 
-                                                            user.email, 
-                                                            municipality.name AS location
-                                              FROM 			plant
-                                              INNER JOIN 	user 
-                                              ON            plant.user_id = user.user_id
-                                              INNER JOIN 	municipality 
-                                              ON            user.municipality_id = municipality.municipality_id
-                                              INNER JOIN 	plantdelivery
-                                              ON            plant.plant_id = plantdelivery.plant_id
-                                              INNER JOIN 	delivery 
-                                              ON            plantdelivery.delivery_id = delivery.delivery_id
-                                              GROUP BY 	    plant.plant_id
-                                              ORDER BY 	    plant.created DESC;`);
+        let {nimi, hinta, toimitus, sijainti, raja, offset} = query;
+        const whereClause = [];
+        const data = [];
+        let sql =`SELECT 		plant.plant_id, 
+                                plant.name, 
+                                plant.price, 
+                                plant.description, 
+                                plant.instruction, 
+                                plant.imagename, 
+                                GROUP_CONCAT(
+                                    DISTINCT delivery.name 
+                                    ORDER BY delivery.name ASC 
+                                    SEPARATOR ', '
+                                ) AS delivery,
+                                (
+                                    SELECT COUNT(plant_id) 
+                                    FROM plantfavourites 
+                                    WHERE plant_id = plant.plant_id
+                                ) AS favourites,
+                                plant.created, 
+                                plant.edited, 
+                                user.user_id, 
+                                user.username, 
+                                user.email, 
+                                municipality.name AS location
+                  FROM 			plant
+                  INNER JOIN 	user 
+                  ON            plant.user_id = user.user_id
+                  INNER JOIN 	municipality 
+                  ON            user.municipality_id = municipality.municipality_id
+                  INNER JOIN 	plantdelivery
+                  ON            plant.plant_id = plantdelivery.plant_id
+                  INNER JOIN 	delivery 
+                  ON            plantdelivery.delivery_id = delivery.delivery_id`;
+
+        if (nimi) {
+            whereClause.push(`plant.name LIKE ? `);
+            data.push('%' + nimi.toLowerCase() + '%');
+        }
+
+        if (hinta) {
+            whereClause.push(`plant.price <= ? `);
+            data.push(hinta);
+        }
+
+        if (toimitus) {
+            whereClause.push(`delivery.name = ? `);
+            data.push(toimitus);
+        }
+
+        if (sijainti) {
+            whereClause.push(`municipality.name = ? `);
+            data.push(sijainti);
+        }
+
+        if (whereClause.length > 0) {
+            sql += ` WHERE ` + whereClause.join('AND ');
+        }
+        
+        sql += ` GROUP BY plant.plant_id
+                ORDER BY plant.created DESC`
+
+        if (raja) {
+            raja = Number(raja);
+            sql += ` LIMIT ?`;
+            data.push(raja);
+        }
+
+        if (offset) {
+            offset = Number(offset);
+            sql += ` OFFSET ?`;
+        }
+
+        sql += `;`;
+
+        let rows;
+
+        if (data) {
+            [rows] = await promisePool.query(sql, data);
+        } else {
+            [rows] = await promisePool.query(sql);
+        }
+        
         return rows;
     } catch (e) {
         console.error('getAllPlants', e.message);
         next(httpError('Database error', 500));
     }
 };
-
-const getMaxAmountOfPlants = async (next) => {
-    try{
-        const [rows] = await promisePool.query(`SELECT 		plant.plant_id, 
-                                                            plant.name, 
-                                                            plant.price, 
-                                                            plant.description, 
-                                                            plant.instruction, 
-                                                            plant.imagename, 
-                                                            GROUP_CONCAT(
-                                                                DISTINCT delivery.name 
-                                                                ORDER BY delivery.name ASC
-                                                                SEPARATOR ', '
-                                                            ) AS delivery,
-                                                            (
-                                                                SELECT COUNT(plant_id) 
-                                                                FROM plantfavourites 
-                                                                WHERE plant_id = plant.plant_id
-                                                            ) AS favourites,
-                                                            plant.created, 
-                                                            plant.edited, 
-                                                            user.user_id, 
-                                                            user.username, 
-                                                            user.email, 
-                                                            municipality.name AS location
-                                                FROM 		plant
-                                                INNER JOIN 	user ON plant.user_id = user.user_id
-                                                INNER JOIN 	municipality ON user.municipality_id = municipality.municipality_id
-                                                INNER JOIN 	plantdelivery ON plant.plant_id = plantdelivery.plant_id
-                                                INNER JOIN 	delivery ON plantdelivery.delivery_id = delivery.delivery_id
-                                                GROUP BY 	plant.plant_id
-                                                ORDER BY 	plant.created DESC LIMIT 0, 3;`);
-        return rows;
-    } catch (e) {
-        console.error('getMaxAmountOfPlants', e.message);
-        next(httpError('Database error', 500));
-    }
-}
 
 const getPlant = async (data, next) => {
     try {
@@ -280,5 +292,4 @@ module.exports = {
     updatePlant,
     deletePlant,
     getUsersAllPlants,
-    getMaxAmountOfPlants,
 };

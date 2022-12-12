@@ -5,7 +5,7 @@ const {check, body} = require('express-validator');
 const multer  = require('multer');
 const router = express.Router();
 const passport = require('../utils/pass');
-const {plant_list_get, plant_get, plant_post, plant_delete, plant_put, plant_amount_get} = require('../controllers/plantController');
+const {plant_list_get, plant_get, plant_post, plant_delete, plant_put} = require('../controllers/plantController');
 const {comment_list_get, comment_post, comment_delete} = require('../controllers/commentController');
 const { favourite_post, favourite_delete } = require('../controllers/favouriteController');
 
@@ -30,6 +30,24 @@ const optionalAuth = (req, res, next) => {
 
 router.route('/').
     get(optionalAuth,
+        check('nimi').
+            escape(),
+        check('hinta').
+            if(check('hinta').exists()).
+            isInt().
+            escape(),
+        check('toimitus').
+            escape(),
+        check('sijainti').
+            escape(),
+        check('raja').
+            if(check('raja').exists()).
+            isInt().
+            escape(),
+        check('offset').
+            if(check('offset').exists()).
+            isInt().
+            escape(),
         plant_list_get).
     post(upload.single('image'),
         body('name', 'Name must have minimum of 3 and maximum of 200 characters.').
@@ -46,10 +64,6 @@ router.route('/').
         body('delivery').escape(),
         passport.authenticate('jwt', {session: false}),
         plant_post);
-
-router.route('/uusimmat/').
-get(optionalAuth,
-    plant_amount_get);
 
 router.route('/:id').
     get(check('id').isInt(),

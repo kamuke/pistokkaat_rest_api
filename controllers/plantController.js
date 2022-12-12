@@ -7,7 +7,6 @@ const {validationResult} = require('express-validator');
 
 const plant_list_get = async (req, res, next) => {
     try {
-
         // Extract the validation errors from a request.
         const errors = validationResult(req);
 

@@ -25,7 +25,7 @@ Response:
 
 ```json
 {
-  "message": "User added",
+  "message": "Käyttäjä lisätty.",
   "user_id": 3
 }
 ```
@@ -147,7 +147,7 @@ Response:
 
 ```json
 {
-  "message": "User updated"
+  "message": "Käyttäjä päivitetty."
 }
 ```
 
@@ -165,7 +165,7 @@ Response:
 
 ```json
 {
-  "message": "User deleted"
+  "message": "Käyttäjä poistettu."
 }
 ```
 
@@ -212,10 +212,7 @@ Response:
     "description": "Isolehtinen kasvi, joka tekee ilmajuuria.",
     "instruction": "Peikonlehti tarvitsee paljon vettä ja valoa.",
     "imagename": "dasjdsalkdj832",
-    "delivery": [
-        "Nouto",
-        " Postitus"
-    ],
+    "delivery": "Nouto, Postitus",
     "favourites": 2,
     "created": "2022-12-09T21:23:12.000Z",
     "edited": null,
@@ -243,10 +240,7 @@ Response:
     "description": "Isolehtinen kasvi, joka tekee ilmajuuria.",
     "instruction": "Peikonlehti tarvitsee paljon vettä ja valoa.",
     "imagename": "dasjdsalkdj832",
-    "delivery": [
-        "Nouto",
-        " Postitus"
-    ],
+    "delivery": "Nouto, Postitus",
     "favourites": 2,
     "created": "2022-12-09T21:23:12.000Z",
     "edited": null,
@@ -300,6 +294,72 @@ Response:
 ```http
   GET /plant
 ```
+
+Response:
+
+```json
+[
+    {
+        "plant_id": 1,
+        "name": "Peikonlehti",
+        "price": 3,
+        "description": "Isolehtinen kasvi, joka tekee ilmajuuria.",
+        "instruction": "Peikonlehti tarvitsee paljon vettä ja valoa.",
+        "imagename": "dasjdsalkdj832",
+        "delivery": "Nouto, Postitus",
+        "favourites": 0,
+        "created": "2022-12-09T21:23:12.000Z",
+        "edited": "2022-12-10T21:23:12.000Z",
+        "seller": {
+            "user_id": 2,
+            "username": "username",
+            "location": "Kerava"
+        }
+    }
+]
+```
+
+```http
+  With Authorization: Bearer token
+```
+
+```json
+[
+    {
+        "plant_id": 1,
+        "name": "Peikonlehti",
+        "price": 3,
+        "description": "Isolehtinen kasvi, joka tekee ilmajuuria.",
+        "instruction": "Peikonlehti tarvitsee paljon vettä ja valoa.",
+        "imagename": "dasjdsalkdj832",
+        "delivery": "Nouto, Postitus",
+        "favourites": 0,
+        "created": "2022-12-09T21:23:12.000Z",
+        "edited": "2022-12-10T21:23:12.000Z",
+        "seller": {
+            "user_id": 2,
+            "username": "username23",
+            "location": "Kerava",
+            "email": "username@mail.fi"
+        }
+    }
+]
+```
+
+#### Get all plants, search
+
+```http
+  GET /plant?nimi=peikonlehti&hinta=6...
+```
+
+| Parameter | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `nimi` | `string` | **Optional** |
+| `hinta` | `int` | **Optional** |
+| `toimitus` | `string` | **Optional** |
+| `sijainti` | `string` | **Optional** |
+| `raja` | `int` | **Optional** |
+| `offset` | `int` | **Optional** |
 
 Response:
 
@@ -436,7 +496,7 @@ Response:
 
 ```json
 {
-  "message": "Plant added",
+  "message": "Pistokas lisätty.",
   "plant_id": 2
 }
 ```
@@ -468,7 +528,7 @@ Response:
 
 ```json
 {
-  "message": "Plant updated"
+  "message": "Pistokas päivitetty."
 }
 ```
 
@@ -490,7 +550,7 @@ Response:
 
 ```json
 {
-  "message": "Plant deleted"
+  "message": "Pistokas poistettu."
 }
 ```
 
@@ -541,7 +601,7 @@ Response:
 
 ```json
 {
-  "message": "Comment added"
+  "message": "Kommentti lisätty."
 }
 ```
 
@@ -564,7 +624,7 @@ Response:
 
 ```json
 {
-  "message": "Comment deleted"
+  "message": "Kommentti poistettu."
 }
 ```
 
@@ -586,7 +646,7 @@ Response:
 
 ```json
 {
-  "message": "Favourite added"
+  "message": "Suosikki lisätty."
 }
 ```
 
@@ -608,7 +668,7 @@ Response:
 
 ```json
 {
-  "message": "Favourite deleted"
+  "message": "Suosikki poistettu."
 }
 ```
 

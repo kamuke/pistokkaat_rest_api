@@ -58,7 +58,7 @@ const comment_post = async (req, res, next) => {
         }
 
         res.json({
-            message: 'Comment added'
+            message: 'Kommentti lisätty.'
         });
     } catch (e) {
         console.error('comment_post', e.message);

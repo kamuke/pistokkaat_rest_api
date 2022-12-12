@@ -77,7 +77,7 @@ const user_post = async (req, res, next) => {
         }
 
         res.json({
-            message: 'Käyttäjä lisätty onnistuneesti.',
+            message: 'Käyttäjä lisätty.',
             user_id: result.insertId
         });
     } catch (e) {

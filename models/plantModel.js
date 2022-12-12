@@ -36,6 +36,8 @@ const getAllPlants = async (next, query) => {
                   ON            plant.user_id = user.user_id
                   INNER JOIN 	municipality 
                   ON            user.municipality_id = municipality.municipality_id
+                  INNER	JOIN	province 
+                  ON            municipality.province_id = province.province_id
                   INNER JOIN 	plantdelivery
                   ON            plant.plant_id = plantdelivery.plant_id
                   INNER JOIN 	delivery 
@@ -57,7 +59,7 @@ const getAllPlants = async (next, query) => {
         }
 
         if (sijainti) {
-            whereClause.push(`municipality.name = ? `);
+            whereClause.push(`province.name = ? `);
             data.push(sijainti);
         }
 
@@ -121,12 +123,17 @@ const getPlant = async (data, next) => {
                                                             user.email, 
                                                             municipality.name AS location
                                                 FROM 		plant
-                                                INNER JOIN 	user ON plant.user_id = user.user_id
-                                                INNER JOIN 	municipality ON user.municipality_id = municipality.municipality_id
-                                                INNER JOIN 	plantdelivery ON plant.plant_id = plantdelivery.plant_id
-                                                INNER JOIN 	delivery ON plantdelivery.delivery_id = delivery.delivery_id
+                                                INNER JOIN 	user 
+                                                ON          plant.user_id = user.user_id
+                                                INNER JOIN 	municipality 
+                                                ON          user.municipality_id = municipality.municipality_id
+                                                INNER JOIN 	plantdelivery 
+                                                ON          plant.plant_id = plantdelivery.plant_id
+                                                INNER JOIN 	delivery 
+                                                ON          plantdelivery.delivery_id = delivery.delivery_id
                                                 WHERE       plant.plant_id = ?
-                                                GROUP BY 	plant.plant_id;`, data);
+                                                GROUP BY 	plant.plant_id
+                                                LIMIT 1;`, data);
         return rows.pop();
     } catch (e) {
         console.error('getPlant', e.message);

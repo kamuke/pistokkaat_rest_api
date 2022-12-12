@@ -10,14 +10,14 @@ const user_list_get = async (req, res, next) => {
         const result = await getAllUsers(next);
 
         if (result.length < 1) {
-            next(httpError('No users found', 404));
+            next(httpError('Käyttäjiä ei löytynyt.', 404));
             return;
         }
 
         res.json(result);
     } catch (e) {
         console.error('user_list_get', e.message);
-        next(httpError('Internal server error', 500));
+        next(httpError('Sisäinen palvelinvirhe.', 500));
     }
 };
 
@@ -29,14 +29,14 @@ const user_get = async (req, res, next) => {
         // There are errors in data
         if (!errors.isEmpty()) {
             console.error('user_get validation', errors.array());
-            next(httpError('Invalid data', 400));
+            next(httpError('Virheellistä tietoa.', 400));
             return;
         }
 
         let result = await getUser([req.params.id], next);
 
         if (!result) {
-            next(httpError('No user found', 404));
+            next(httpError('Käyttäjää ei löytynyt.', 404));
             return;
         }
 
@@ -49,7 +49,7 @@ const user_get = async (req, res, next) => {
         res.json(result);
     } catch (e) {
         console.error('user_get', e.message);
-        next(httpError('Internal server error', 500));
+        next(httpError('Sisäinen palvelinvirhe.', 500));
     }
 };
 
@@ -60,13 +60,13 @@ const user_put = async (req, res, next) => {
 
         // Check if email is already in use
         if (users.find(user => user && user.email === req.body.email && user.user_id !== req.user.user_id)) {
-            next(httpError('Email already in use', 400));
+            next(httpError('Sähköposti on jo käytössä.', 400));
             return;
         }
 
         // Check if username is already in use
         if (users.find(user => user && user.username === req.body.username && user.user_id !== req.user.user_id)) {
-            next(httpError('Username already in use', 400));
+            next(httpError('Käyttäjätunnus on jo käytössä.', 400));
             return;
         }
 
@@ -83,7 +83,7 @@ const user_put = async (req, res, next) => {
         const data = [
             req.body.email,
             req.body.username,
-            req.body.municipality_id
+            req.body.municipality
         ];
 
         const salt = bcrypt.genSaltSync(10);
@@ -92,7 +92,7 @@ const user_put = async (req, res, next) => {
         if (req.body.newpassword) {
             // Check if password doesn't match the old password
             if (!bcrypt.compareSync(req.body.oldpassword, user.password)) {
-                next(httpError('Incorrect password.', 400));
+                next(httpError('Väärä salasana.', 400));
                 return;
             }
             data.push(password);
@@ -103,14 +103,14 @@ const user_put = async (req, res, next) => {
         const result = await updateUser(data, next);
 
         if (result.affectedRows < 1) {
-            next(httpError('No user updated', 400));
+            next(httpError('Käyttäjää ei päivitetty.', 400));
             return;
         }
 
-        res.json({message: 'User updated',});
+        res.json({message: 'Käyttäjä päivitetty.',});
     } catch (e) {
         console.error('user_put', e.message);
-        next(httpError('Internal server error', 500));
+        next(httpError('Sisäinen palvelinvirhe.', 500));
     }
 };
 
@@ -122,27 +122,27 @@ const user_delete = async (req, res, next) => {
         // There are errors in data
         if (!errors.isEmpty()) {
             console.error('user_delete validation', errors.array());
-            next(httpError('Invalid data', 400));
+            next(httpError('Virheellistä tietoa.', 400));
             return;
         }
 
         const result = await deleteUser(req.user.user_id, next);
 
         if (result.affectedRows < 1) {
-            next(httpError('No user deleted', 400));
+            next(httpError('Käyttäjää ei poistettu.', 400));
             return;
         }
 
-        res.json({message: 'User deleted',});
+        res.json({message: 'Käyttäjä poistettu.',});
     } catch (e) {
         console.error('user_delete', e.message);
-        next(httpError('Internal server error', 500));
+        next(httpError('Sisäinen palvelinvirhe.', 500));
     }
 };
 
 const check_token = (req, res, next) => {
     if (!req.user) {
-      next(httpError('Token not valid', 403));
+      next(httpError('Tokeni ei ole validi.', 403));
     } else {
       res.json({ user: req.user });
     }

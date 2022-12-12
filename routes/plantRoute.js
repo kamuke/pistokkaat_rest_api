@@ -50,15 +50,15 @@ router.route('/').
             escape(),
         plant_list_get).
     post(upload.single('image'),
-        body('name', 'Name must have minimum of 3 and maximum of 200 characters.').
+        body('name', 'Kasvilajin nimen tulee olla vähintään 3 ja maksimissaan 200 merkkiä.').
             isLength({min: 3, max: 200}).
             escape(),
         body('price').
             isInt(),
-        body('description', 'Description must have minimum of 30 and maximum of 280 characters.').
+        body('description', 'Kuvauksen tulee olla vähintään 30 ja maksimissaan 280 merkkiä.').
             isLength({min: 30, max: 280}).
             escape(),
-        body('instruction', 'Instruction must have minimum of 30 and maximum of 280 characters.').
+        body('instruction', 'Hoito-ohjeiden tulee olla vähintään 30 ja maksimissaan 280 merkkiä.').
             isLength({min: 30, max: 280}).
             escape(),
         body('delivery').escape(),
@@ -73,15 +73,15 @@ router.route('/:id').
         passport.authenticate('jwt', {session: false}),
         plant_delete).
     put(check('id').isInt(),
-        body('name', 'Name must have minimum of 3 and maximum of 200 characters.').
+        body('name', 'Kasvilajin nimen tulee olla vähintään 3 ja maksimissaan 200 merkkiä.').
             isLength({min: 3, max: 200}).
             escape(),
         body('price').
             isInt(),
-        body('description', 'Description must have minimum of 30 and maximum of 280 characters.').
+        body('description', 'Kuvauksen tulee olla vähintään 30 ja maksimissaan 280 merkkiä.').
             isLength({min: 30, max: 280}).
             escape(),
-        body('instruction', 'Instruction must have minimum of 30 and maximum of 280 characters.').
+        body('instruction', 'Hoito-ohjeiden tulee olla vähintään 30 ja maksimissaan 280 merkkiä.').
             isLength({min: 30, max: 280}).
             escape(),
         body('delivery').escape(),
@@ -92,7 +92,7 @@ router.route('/:id/comment').
         get(check('id').isInt(),
             comment_list_get).
         post(check('id').isInt(),
-            body('comment', 'Comment must have minimum of 3 and maximum of 280 characters.').
+            body('comment', 'Kommentissa tulee olla vähintään 3 ja maksimissaan 280 merkkiä.').
                 isLength({min: 3, max: 280}).
                 escape(),
             passport.authenticate('jwt', {session: false}),

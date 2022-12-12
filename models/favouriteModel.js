@@ -40,7 +40,7 @@ const getFavourites = async (data, next) => {
         return rows;
     } catch (e) {
         console.error('getFavourites', e.message);
-        next(httpError('Database error', 500));
+        next(httpError('Virhe tietokannassa.', 500));
     }
 };
 
@@ -50,7 +50,7 @@ const addFavourite = async (data, next) => {
         return rows;
     } catch (e) {
         console.error('addFavourite', e.message);
-        next(httpError('Database error', 500));
+        next(httpError('Virhe tietokannassa.', 500));
     }
 };
 
@@ -60,7 +60,7 @@ const deleteFavourite = async (data, next) => {
         return rows;
     } catch (e) {
         console.error('deleteFavourite', e.message);
-        next(httpError('Database error', 500));
+        next(httpError('Virhe tietokannassa.', 500));
     }
 };
 

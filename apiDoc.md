@@ -18,7 +18,7 @@ REST API for school course
 | :-------- | :------- | :-------------------------------- |
 | `email` | `email` | **Required**, email, max length 60. Must be unique |
 | `username` | `string` | **Required**, min length 3, max length 20. Must be unique |
-| `municipality_id` | `int` | **Required**, ID of the municipality |
+| `municipality` | `int` | **Required**, ID of the municipality |
 | `password` | `string` | **Required**, min length 8 characters, at least one capital letter |
 
 Response:
@@ -139,7 +139,7 @@ Response:
 | :-------- | :------- | :-------------------------------- |
 | `email` | `email` | **Required**, email, max length 60. Must be unique |
 | `username` | `string` | **Required**, min length 3, max length 20. Must be unique |
-| `municipality_id` | `int` | **Required**, ID of the municipality |
+| `municipality` | `int` | **Required**, ID of the municipality |
 | `oldpassword` | `string` | **Required only if newpassword exists**, must match old password |
 | `newpassword` | `string` | **Optional**, min length 8 characters, at least one capital letter and can't match oldpassword |
 
@@ -437,7 +437,7 @@ Response:
 ```json
 {
   "message": "Plant added",
-  "id": 2
+  "plant_id": 2
 }
 ```
 

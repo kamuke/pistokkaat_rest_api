@@ -21,7 +21,7 @@ const favourite_list_get = async (req, res, next) => {
         console.log(result);
 
         if (result.length < 1) {
-            next(httpError('No favourites found', 404));
+            next(httpError('Suosikkeja ei löytynyt.', 404));
             return;
         }
 
@@ -49,7 +49,7 @@ const favourite_list_get = async (req, res, next) => {
         res.json(result);
     } catch (e) {
         console.error('favourite_list_get', e.message);
-        next(httpError('Internal server error', 500));
+        next(httpError('Sisäinen palvelinvirhe.', 500));
     }
 };
 
@@ -72,16 +72,16 @@ const favourite_post = async (req, res, next) => {
         console.log(result);
 
         if (result.length < 1) {
-            next(httpError('Invalid data', 400));
+            next(httpError('Virheellistä tietoa.', 400));
             return;
         }
 
         res.json({
-            message: 'Favourite added'
+            message: 'Suosikki lisätty.'
         });
     } catch (e) {
         console.error('favourite_post', e.message);
-        next(httpError('Internal server error', 500));
+        next(httpError('Sisäinen palvelinvirhe.', 500));
     }
 };
 
@@ -93,7 +93,7 @@ const favourite_delete = async (req, res, next) => {
         // There are errors in data
         if (!errors.isEmpty()) {
             console.error('favourite_delete validation', errors.array());
-            next(httpError('Invalid data', 400));
+            next(httpError('Virheellistä tietoa.', 400));
             return;
         }
 
@@ -102,15 +102,15 @@ const favourite_delete = async (req, res, next) => {
         const result = await deleteFavourite(data, next);
   
         if (result.affectedRows < 1) {
-            next(httpError('No favourite deleted', 400));
+            next(httpError('Suosikkia ei poistettu.', 400));
             return;
         }
   
-        res.json({message: 'Favourite deleted',});
+        res.json({message: 'Suosikki poistettu.',});
 
     } catch (e) {
         console.error('favourite_delete', e.message);
-        next(httpError('Internal server error', 500));
+        next(httpError('Sisäinen palvelinvirhe.', 500));
     }
 }
 

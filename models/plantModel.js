@@ -92,7 +92,7 @@ const getAllPlants = async (next, query) => {
         return rows;
     } catch (e) {
         console.error('getAllPlants', e.message);
-        next(httpError('Database error', 500));
+        next(httpError('Virhe tietokannassa.', 500));
     }
 };
 
@@ -130,7 +130,7 @@ const getPlant = async (data, next) => {
         return rows.pop();
     } catch (e) {
         console.error('getPlant', e.message);
-        next(httpError('Database error', 500));
+        next(httpError('Virhe tietokannassa.', 500));
     }
 };
 
@@ -164,7 +164,7 @@ const addPlant = async(data, delivery, next) => {
         // If something went wrong, rollback so changes will be deleted
         await connection.rollback();
         console.error('addPlant', e.message);
-        next(httpError('Database error', 500));
+        next(httpError('Virhe tietokannassa.', 500));
     } finally {
         connection.release();
         return firstQueryRows;
@@ -219,7 +219,7 @@ const updatePlant = async (data, delivery, user, next) => {
         // If something went wrong, rollback so changes will be deleted
         await connection.rollback();
         console.error('updatePlant', e.message);
-        next(httpError('Database error', 500));
+        next(httpError('Virhe tietokannassa.', 500));
     } finally {
         connection.release();
         return firstQueryRows;
@@ -242,7 +242,7 @@ const deletePlant = async (data, user, next) => {
         return rows;
     } catch (e) {
         console.error('deletePlant', e.message);
-        next(httpError('Database error', 500));
+        next(httpError('Virhe tietokannassa.', 500));
     }
 };
 
@@ -281,7 +281,7 @@ const getUsersAllPlants = async (data, next) => {
         return rows;
     } catch (e) {
         console.error('getUsersAllPlants', e.message);
-        next(httpError('Database error', 500));
+        next(httpError('Virhe tietokannassa.', 500));
     }
 };
 

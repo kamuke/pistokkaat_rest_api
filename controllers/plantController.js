@@ -2,6 +2,7 @@
 'use strict';
 const {getAllPlants, getPlant, deletePlant, addPlant, updatePlant, getUsersAllPlants} = require('../models/plantModel');
 const {httpError} = require('../utils/errors');
+const sharp = require('sharp');
 const {validationResult} = require('express-validator');
 
 const plant_list_get = async (req, res, next) => {
@@ -20,7 +21,7 @@ const plant_list_get = async (req, res, next) => {
         let result = await getAllPlants(next, req.query);
 
         if (result.length < 1) {
-            next(httpError('No plants found', 404));
+            next(httpError('Pistokkaita ei löytynyt.', 404));
             return;
         }
 
@@ -52,7 +53,7 @@ const plant_list_get = async (req, res, next) => {
         res.json(result);
     } catch (e) {
         console.error('plant_list_get', e.message);
-        next(httpError('Internal server error', 500));
+        next(httpError('Sisäinen palvelinvirhe.', 500));
     }
 };
 
@@ -64,7 +65,7 @@ const plant_get = async (req, res, next) => {
         // There are errors in data
         if (!errors.isEmpty()) {
             console.error('plant_get validation', errors.array());
-            next(httpError('Invalid data', 400));
+            next(httpError('Virheellistä tietoa.', 400));
             return;
         }
 
@@ -73,7 +74,7 @@ const plant_get = async (req, res, next) => {
         let result = await getPlant(data, next);
 
         if (!result) {
-            next(httpError('No plant found', 404));
+            next(httpError('Pistokasta ei löytynyt.', 404));
             return;
         }
 
@@ -99,7 +100,7 @@ const plant_get = async (req, res, next) => {
         res.json(result);
     } catch (e) {
         console.error('plant_get', e.message);
-        next(httpError('Internal server error', 500));
+        next(httpError('Sisäinen palvelinvirhe.', 500));
     }
 };
 
@@ -115,6 +116,11 @@ const plant_post = async (req, res, next) => {
             return;
         }
 
+        const thumbnail = await sharp(req.file.path).
+                        resize(160, 220).
+                        png().
+                        toFile('./thumbnails/' + req.file.filename);
+
         const data = [
             req.body.name,
             req.body.price,
@@ -129,17 +135,19 @@ const plant_post = async (req, res, next) => {
         const result = await addPlant(data, delivery, next);
 
         if (result.length < 1) {
-            next(httpError('Invalid data', 400));
+            next(httpError('Virheellistä tietoa.', 400));
             return;
         }
 
-        res.json({
-            message: 'Plant added.',
-            plant_id: result[0].insertId,
-        });
+        if (thumbnail) {
+            res.json({
+                message: 'Pistokas lisätty.',
+                plant_id: result[0].insertId,
+            });
+        }
     } catch (e) {
         console.error('plant_post', e.message);
-        next(httpError('Internal server error', 500));
+        next(httpError('Sisäinen palvelinvirhe.', 500));
     }
 };
 
@@ -175,14 +183,14 @@ const plant_put = async (req, res, next) => {
         const result = await updatePlant(data, delivery, req.user, next);
 
         if (result[0].affectedRows < 1) {
-            next(httpError('No plant updated', 400));
+            next(httpError('Pistokasta ei päivitetty.', 400));
             return;
         }
   
-        res.json({message: 'Plant updated',});
+        res.json({message: 'Pistokas päivitetty.',});
     } catch (e) {
         console.error('plant_put', e.message);
-        next(httpError('Internal server error', 500));
+        next(httpError('Sisäinen palvelinvirhe.', 500));
     }
 };
 
@@ -194,7 +202,7 @@ const plant_delete = async (req, res, next) => {
         // There are errors in data
         if (!errors.isEmpty()) {
             console.error('plant_delete validation', errors.array());
-            next(httpError('Invalid data', 400));
+            next(httpError('Virheellistä tietoa.', 400));
             return;
         }
 
@@ -208,14 +216,14 @@ const plant_delete = async (req, res, next) => {
         const result = await deletePlant(data, req.user, next);
   
         if (result.affectedRows < 1) {
-            next(httpError('No plant deleted', 400));
+            next(httpError('Pistokasta ei poistettu.', 400));
             return;
         }
   
-        res.json({message: 'Plant deleted',});
+        res.json({message: 'Pistokas poistettu.',});
     } catch (e) {
         console.error('plant_delete', e.message);
-        next(httpError('Internal server error', 500));
+        next(httpError('Sisäinen palvelinvirhe.', 500));
     }
 };
 
@@ -227,14 +235,14 @@ const users_plant_list_get = async (req, res, next) => {
         // There are errors in data
         if (!errors.isEmpty()) {
             console.error('user_plant_list_get validation', errors.array());
-            next(httpError('Invalid data', 400));
+            next(httpError('Virheellistä tietoa.', 400));
             return;
         }
 
         let result = await getUsersAllPlants([req.params.id], next);
 
         if (result.length < 1) {
-            next(httpError('No plants found', 404));
+            next(httpError('Pistokkaita ei löytynyt.', 404));
             return;
         }
 
@@ -269,7 +277,7 @@ const users_plant_list_get = async (req, res, next) => {
         res.json(result);
     } catch (e) {
         console.error('user_plant_list_get', e.message);
-        next(httpError('Internal server error', 500));
+        next(httpError('Sisäinen palvelinvirhe.', 500));
     }
 };
 

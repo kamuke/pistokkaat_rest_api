@@ -16,7 +16,7 @@ const getAllLocations = async (next) => {
         return rows;
     } catch (e) {
         console.error('getAllLocations', e.message);
-        next(httpError('Database error', 500));
+        next(httpError('Virhe tietokannassa.', 500));
     }
 };
 

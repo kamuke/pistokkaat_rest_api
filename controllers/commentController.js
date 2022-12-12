@@ -19,14 +19,14 @@ const comment_list_get = async (req, res, next) => {
         let result = await getComments([req.params.id]);
 
         if (result.length < 1) {
-            next(httpError('No comments found', 404));
+            next(httpError('Kommentteja ei löytynyt.', 404));
             return;
         }
 
         res.json(result);
     } catch (e) {
         console.error('comment_list_get', e.message);
-        next(httpError('Internal server error', 500));
+        next(httpError('Sisäinen palvelinvirhe.', 500));
     }
 };
 
@@ -53,7 +53,7 @@ const comment_post = async (req, res, next) => {
         console.log(result);
 
         if (result.length < 1) {
-            next(httpError('Invalid data', 400));
+            next(httpError('Virheellistä tietoa.', 400));
             return;
         }
 
@@ -62,7 +62,7 @@ const comment_post = async (req, res, next) => {
         });
     } catch (e) {
         console.error('comment_post', e.message);
-        next(httpError('Internal server error', 500));
+        next(httpError('Sisäinen palvelinvirhe.', 500));
     }
 };
 
@@ -74,7 +74,7 @@ const comment_delete = async (req, res, next) => {
         // There are errors in data
         if (!errors.isEmpty()) {
             console.error('comment_delete validation', errors.array());
-            next(httpError('Invalid data', 400));
+            next(httpError('Virheellistä tietoa.', 400));
             return;
         }
 
@@ -88,15 +88,15 @@ const comment_delete = async (req, res, next) => {
         const result = await deleteComment(data, req.user, next);
   
         if (result.affectedRows < 1) {
-            next(httpError('No comment deleted', 400));
+            next(httpError('Kommenttia ei poistettu.', 400));
             return;
         }
   
-        res.json({message: 'Comment deleted',});
+        res.json({message: 'Kommentti poistettu.',});
 
     } catch (e) {
         console.error('comment_delete', e.message);
-        next(httpError('Internal server error', 500));
+        next(httpError('Sisäinen palvelinvirhe.', 500));
     }
 }
 

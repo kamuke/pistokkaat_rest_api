@@ -71,14 +71,13 @@ const getAllPlants = async (next, query) => {
                 ORDER BY plant.created DESC`
 
         if (raja) {
-            raja = Number(raja);
             sql += ` LIMIT ?`;
-            data.push(raja);
-        }
+            data.push(Number(raja));
 
-        if (offset) {
-            offset = Number(offset);
-            sql += ` OFFSET ?`;
+            if (offset) {
+                sql += ` OFFSET ?`;
+                data.push(Number(offset));
+            }
         }
 
         sql += `;`;

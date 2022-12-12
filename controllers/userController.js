@@ -59,13 +59,13 @@ const user_put = async (req, res, next) => {
         const user = await getUser([req.user.user_id], next);
 
         // Check if email is already in use
-        if (users.find(user => user && user.email === req.body.email && user.user_id !== req.user.user_id)) {
+        if (users.find(user => user && user.email.toLowerCase() === req.body.email.toLowerCase() && user.user_id !== req.user.user_id)) {
             next(httpError('Sähköposti on jo käytössä.', 400));
             return;
         }
 
         // Check if username is already in use
-        if (users.find(user => user && user.username === req.body.username && user.user_id !== req.user.user_id)) {
+        if (users.find(user => user && user.username.toLowerCase() === req.body.username.toLowerCase() && user.user_id !== req.user.user_id)) {
             next(httpError('Käyttäjätunnus on jo käytössä.', 400));
             return;
         }

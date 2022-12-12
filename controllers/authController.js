@@ -38,13 +38,13 @@ const user_post = async (req, res, next) => {
         const users = await getAllUsers(next);
 
         // Check if email is already in use
-        if (users.find(user => user && user.email === req.body.email)) {
+        if (users.find(user => user && user.email.toLowerCase() === req.body.email.toLowerCase())) {
             next(httpError('Sähköposti on jo käytössä.', 400));
             return;
         }
 
         // Check if username is already in use
-        if (users.find(user => user && user.username === req.body.username)) {
+        if (users.find(user => user && user.username.toLowerCase() === req.body.username.toLowerCase())) {
             next(httpError('Käyttäjätunnus on jo käytössä.', 400));
             return;
         }

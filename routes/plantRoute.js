@@ -5,7 +5,7 @@ const {check, body} = require('express-validator');
 const multer  = require('multer');
 const router = express.Router();
 const passport = require('../utils/pass');
-const {plant_list_get, plant_get, plant_post, plant_delete, plant_put} = require('../controllers/plantController');
+const {plant_list_get, plant_get, plant_post, plant_delete, plant_put, plant_amount_get} = require('../controllers/plantController');
 const {comment_list_get, comment_post, comment_delete} = require('../controllers/commentController');
 const { favourite_post, favourite_delete } = require('../controllers/favouriteController');
 
@@ -46,6 +46,10 @@ router.route('/').
         body('delivery').escape(),
         passport.authenticate('jwt', {session: false}),
         plant_post);
+
+router.route('/uusimmat/').
+get(optionalAuth,
+    plant_amount_get);
 
 router.route('/:id').
     get(check('id').isInt(),

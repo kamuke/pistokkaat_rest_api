@@ -46,6 +46,44 @@ const getAllPlants = async (next) => {
     }
 };
 
+const getMaxAmountOfPlants = async (next) => {
+    try{
+        const [rows] = await promisePool.query(`SELECT 		plant.plant_id, 
+                                                            plant.name, 
+                                                            plant.price, 
+                                                            plant.description, 
+                                                            plant.instruction, 
+                                                            plant.imagename, 
+                                                            GROUP_CONCAT(
+                                                                DISTINCT delivery.name 
+                                                                ORDER BY delivery.name ASC
+                                                                SEPARATOR ', '
+                                                            ) AS delivery,
+                                                            (
+                                                                SELECT COUNT(plant_id) 
+                                                                FROM plantfavourites 
+                                                                WHERE plant_id = plant.plant_id
+                                                            ) AS favourites,
+                                                            plant.created, 
+                                                            plant.edited, 
+                                                            user.user_id, 
+                                                            user.username, 
+                                                            user.email, 
+                                                            municipality.name AS location
+                                                FROM 		plant
+                                                INNER JOIN 	user ON plant.user_id = user.user_id
+                                                INNER JOIN 	municipality ON user.municipality_id = municipality.municipality_id
+                                                INNER JOIN 	plantdelivery ON plant.plant_id = plantdelivery.plant_id
+                                                INNER JOIN 	delivery ON plantdelivery.delivery_id = delivery.delivery_id
+                                                GROUP BY 	plant.plant_id
+                                                ORDER BY 	plant.created DESC LIMIT 0, 3;`);
+        return rows;
+    } catch (e) {
+        console.error('getMaxAmountOfPlants', e.message);
+        next(httpError('Database error', 500));
+    }
+}
+
 const getPlant = async (data, next) => {
     try {
         const [rows] = await promisePool.query(`SELECT 		plant.plant_id, 
@@ -242,4 +280,5 @@ module.exports = {
     updatePlant,
     deletePlant,
     getUsersAllPlants,
+    getMaxAmountOfPlants,
 };

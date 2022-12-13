@@ -21,6 +21,7 @@ app.use(passport.initialize());
 
 app.use(express.static('uploads'));
 app.use('/thumbnails', express.static('thumbnails'));
+app.use('/resizes', express.static('resizes'));
 
 app.use('/auth', authRoute);
 app.use('/plant', plantRoute);

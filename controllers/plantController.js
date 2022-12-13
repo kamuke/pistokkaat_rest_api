@@ -120,6 +120,11 @@ const plant_post = async (req, res, next) => {
                         png().
                         toFile('./thumbnails/' + req.file.filename);
 
+        const resizeImg = await sharp(req.file.path).
+                        resize({width: 870}).
+                        png().
+                        toFile('./resizes/' + req.file.filename);
+        
         const data = [
             req.body.name,
             req.body.price,
@@ -138,7 +143,7 @@ const plant_post = async (req, res, next) => {
             return;
         }
 
-        if (thumbnail) {
+        if (thumbnail && resizeImg) {
             res.json({
                 message: 'Pistokas lisätty.',
                 plant_id: result[0].insertId,

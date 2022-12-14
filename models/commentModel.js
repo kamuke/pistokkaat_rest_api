@@ -15,7 +15,7 @@ const getComments = async (data, next) => {
                                                 INNER JOIN  user
                                                 ON          comment.user_id = user.user_id
                                                 WHERE       comment.plant_id = ?
-                                                ORDER BY    comment.created;`, data);
+                                                ORDER BY    comment.created DESC;`, data);
         return rows;
     } catch (e) {
         console.error('getComments', e.message);

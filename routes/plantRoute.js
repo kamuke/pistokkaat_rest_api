@@ -33,20 +33,14 @@ router.route('/').
         check('nimi').
             escape(),
         check('hinta').
-            if(check('hinta').exists()).
-            isInt().
             escape(),
         check('toimitus').
             escape(),
         check('sijainti').
             escape(),
         check('raja').
-            if(check('raja').exists()).
-            isInt().
             escape(),
         check('offset').
-            if(check('offset').exists()).
-            isInt().
             escape(),
         plant_list_get).
     post(upload.single('image'),

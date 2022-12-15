@@ -84,6 +84,8 @@ const getAllPlants = async (next, query) => {
 
         let rows;
 
+        console.log(sql);
+
         if (data) {
             [rows] = await promisePool.query(sql, data);
         } else {

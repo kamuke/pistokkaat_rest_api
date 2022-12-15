@@ -31,11 +31,14 @@ router.route('/').
             if((value, {req}) => req.body.newpassword).
             if(body('newpassword').exists()).
             notEmpty().
-            withMessage('Lisää vanha salasana, kun vaihdat salasanaa.').
+            withMessage('Lisää vanha salasana, kun haluat vaihtaa salasanaa.').
             custom((value, {req}) => value !== req.body.newpassword).
             withMessage('Uusi ja vanha salasana eivät voi olla sama.').
             escape(),
         body('newpassword').
+            if(body('oldpassword').exists()).
+            notEmpty().
+            withMessage('Lisää myös uusi salasana, kun haluat vaihtaa salasanaa.').
             if(body('newpassword').exists()).
             matches(/(?=.*\p{Lu}).{8,}/u).
             withMessage('Salasanan tulee olla vähintään 8 ja maksimissaan 80 merkkiä, ja salasanassa tulee olla vähintään 1 iso kirjain.').

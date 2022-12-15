@@ -54,8 +54,8 @@ const getAllPlants = async (next, query) => {
         }
 
         if (toimitus) {
-            whereClause.push(`delivery.name = ? `);
-            data.push(toimitus);
+            whereClause.push(`delivery.name LIKE ? `);
+            data.push('%'+toimitus+'%');
         }
 
         if (sijainti) {

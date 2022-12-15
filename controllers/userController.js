@@ -86,10 +86,9 @@ const user_put = async (req, res, next) => {
             req.body.municipality
         ];
 
-        const salt = bcrypt.genSaltSync(10);
-        const password = bcrypt.hashSync(req.body.newpassword, salt);
-
         if (req.body.newpassword) {
+            const salt = bcrypt.genSaltSync(10);
+            const password = bcrypt.hashSync(req.body.newpassword, salt);
             // Check if password doesn't match the old password
             if (!bcrypt.compareSync(req.body.oldpassword, user.password)) {
                 next(httpError('Väärä salasana.', 400));

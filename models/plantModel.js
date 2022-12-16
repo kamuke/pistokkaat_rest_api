@@ -182,12 +182,14 @@ const updatePlant = async (data, delivery, user, next) => {
     let firstQueryRows = [];
 
     try {
-        let firstQuery;
+        let secondQuery;
         connection = await promisePool.getConnection();
+
+        const firstQuery = `DELETE FROM plantdelivery WHERE plant_id=?`;
 
         // If user.role === 0, can edit any plant
         if (user.role === 0) {
-            firstQuery = `UPDATE    plant
+            secondQuery = `UPDATE    plant
                           SET       name=?, 
                                     price=?, 
                                     description=?, 
@@ -195,7 +197,7 @@ const updatePlant = async (data, delivery, user, next) => {
                                     edited=NOW()
                           WHERE     plant_id=?;`;
         } else {
-            firstQuery = `UPDATE    plant 
+            secondQuery = `UPDATE    plant 
                           SET       name=?, 
                                     price=?, 
                                     description=?, 
@@ -203,8 +205,6 @@ const updatePlant = async (data, delivery, user, next) => {
                                     edited=NOW()
                           WHERE     plant_id=? AND user_id=?;`;
         }
-
-        const secondQuery = `DELETE FROM plantdelivery WHERE plant_id=?`;
 
         let thirdQuery = `INSERT INTO plantdelivery(plant_id, delivery_id) VALUES(?, ?)`;
 
@@ -217,8 +217,8 @@ const updatePlant = async (data, delivery, user, next) => {
 
         // Begin transaction
         await connection.beginTransaction();
-        firstQueryRows = await connection.query(firstQuery, data);
-        await connection.query(secondQuery, [data[4]]);
+        firstQueryRows = await connection.query(firstQuery, [data[4]]);
+        await connection.query(secondQuery, data);
         await connection.query(thirdQuery, delivery);
         await connection.commit();
     } catch(e) {

@@ -1,3 +1,3 @@
-# Pistokkaat REST Api / Web-development basics -course
+# Pistokkaat REST API
 
-School project in Metropolia UAS where we developed REST Api. Pistokkaat is for selling and bying plant cuttings.
+REST API done as part of Web-development basics-course in Metropolia UAS. Pistokkaat is for selling and bying plant cuttings.

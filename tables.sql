@@ -6,102 +6,91 @@ USE pistokkaat;
 DROP TABLE if EXISTS province;
 CREATE TABLE province
 (
-	province_id INT NOT NULL AUTO_INCREMENT,
-	name VARCHAR(40) NOT NULL,
-	PRIMARY KEY (province_id)
+    province_id INT NOT NULL AUTO_INCREMENT,
+    name VARCHAR(40) NOT NULL,
+    PRIMARY KEY (province_id)
 );
 
 DROP TABLE if EXISTS municipality;
 CREATE TABLE municipality
 (
-	municipality_id INT NOT NULL AUTO_INCREMENT,
-	name VARCHAR(40) NOT NULL,
-	province_id INT NOT NULL,
-	PRIMARY KEY (municipality_id),
-	FOREIGN KEY (province_id) REFERENCES province(province_id)
+    municipality_id INT NOT NULL AUTO_INCREMENT,
+    name VARCHAR(40) NOT NULL,
+    province_id INT NOT NULL,
+    PRIMARY KEY (municipality_id),
+    FOREIGN KEY (province_id) REFERENCES province(province_id)
 );
 
 DROP TABLE if EXISTS delivery;
 CREATE TABLE delivery
 (
-	delivery_id INT NOT NULL AUTO_INCREMENT,
-	name VARCHAR(60) NOT NULL,
-	PRIMARY KEY (delivery_id)
+    delivery_id INT NOT NULL AUTO_INCREMENT,
+    name VARCHAR(60) NOT NULL,
+    PRIMARY KEY (delivery_id)
 );
 
 DROP TABLE if EXISTS user;
 CREATE TABLE user
 (
-	user_id INT NOT NULL AUTO_INCREMENT,
-	email VARCHAR(60) NOT NULL,
-	username VARCHAR(20) NOT NULL,
-	password VARCHAR(80) NOT NULL,
-	municipality_id INT NOT NULL,
-	role INT NOT NULL DEFAULT 1,
-	PRIMARY KEY (user_id),
-	FOREIGN KEY (municipality_id) REFERENCES municipality(municipality_id),
-	UNIQUE (email),
-	UNIQUE (username)
+    user_id INT NOT NULL AUTO_INCREMENT,
+    email VARCHAR(60) NOT NULL,
+    username VARCHAR(20) NOT NULL,
+    password VARCHAR(80) NOT NULL,
+    municipality_id INT NOT NULL,
+    role INT NOT NULL DEFAULT 1,
+    PRIMARY KEY (user_id),
+    FOREIGN KEY (municipality_id) REFERENCES municipality(municipality_id),
+    UNIQUE (email),
+    UNIQUE (username)
 );
-
-DROP TABLE if EXISTS userlikes;
-CREATE TABLE userlikes
-(
-	liker_id INT NOT NULL,
-	liked_id INT NOT NULL,
-	PRIMARY KEY (liker_id, liked_id),
-	FOREIGN KEY (liker_id) REFERENCES User(user_id),
-	FOREIGN KEY (liked_id) REFERENCES User(user_id)
-);
-
 
 DROP TABLE if EXISTS plant;
 CREATE TABLE plant
 (
-	plant_id INT NOT NULL AUTO_INCREMENT,
-	name VARCHAR(200) NOT NULL,
-	price INT NOT NULL,
-	imagename VARCHAR(280) NOT NULL,
-	description VARCHAR(280) NOT NULL,
-	instruction VARCHAR(280) NOT NULL,
-	user_id INT NOT NULL,
-	created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	edited TIMESTAMP,
-	PRIMARY KEY (plant_id),
-	FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE ON UPDATE CASCADE
+    plant_id INT NOT NULL AUTO_INCREMENT,
+    name VARCHAR(200) NOT NULL,
+    price INT NOT NULL,
+    imagename VARCHAR(280) NOT NULL,
+    description VARCHAR(280) NOT NULL,
+    instruction VARCHAR(280) NOT NULL,
+    user_id INT NOT NULL,
+    created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    edited TIMESTAMP,
+    PRIMARY KEY (plant_id),
+    FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 DROP TABLE if EXISTS plantdelivery;
 CREATE TABLE plantdelivery
 (
-	plant_id INT NOT NULL,
-	delivery_id INT NOT NULL,
-	PRIMARY KEY (plant_id, delivery_id),
-	FOREIGN KEY (plant_id) REFERENCES plant(plant_id) ON DELETE CASCADE ON UPDATE CASCADE,
-	FOREIGN KEY (delivery_id) REFERENCES delivery(delivery_id)
+    plant_id INT NOT NULL,
+    delivery_id INT NOT NULL,
+    PRIMARY KEY (plant_id, delivery_id),
+    FOREIGN KEY (plant_id) REFERENCES plant(plant_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (delivery_id) REFERENCES delivery(delivery_id)
 );
 
 DROP TABLE if EXISTS plantfavourites;
 CREATE TABLE plantfavourites
 (
-	user_id INT NOT NULL,
-	plant_id INT NOT NULL,
-	PRIMARY KEY (user_id, plant_id),
-	FOREIGN KEY (user_id) REFERENCES user(user_id),
-	FOREIGN KEY (plant_id) REFERENCES plant(plant_id)
+    user_id INT NOT NULL,
+    plant_id INT NOT NULL,
+    PRIMARY KEY (user_id, plant_id),
+    FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (plant_id) REFERENCES plant(plant_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 DROP TABLE if EXISTS comment;
 CREATE TABLE comment
 (
-	comment_id INT NOT NULL AUTO_INCREMENT,
-	user_id INT NOT NULL,
-	plant_id INT NOT NULL,
-	comment VARCHAR(280) NOT NULL,
-	created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	PRIMARY KEY (comment_id),
-	FOREIGN KEY (user_id) REFERENCES user(user_id),
-	FOREIGN KEY (plant_id) REFERENCES plant(plant_id)
+    comment_id INT NOT NULL AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    plant_id INT NOT NULL,
+    comment VARCHAR(280) NOT NULL,
+    created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (comment_id),
+    FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (plant_id) REFERENCES plant(plant_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 INSERT INTO province(name) VALUES('Uusimaa');
@@ -437,20 +426,8 @@ INSERT INTO municipality(name,province_id) VALUES ('Vårdö',19);
 INSERT INTO delivery(name) VALUES('Nouto');
 INSERT INTO delivery(name) VALUES('Postitus');
 
-INSERT INTO user(email, username, password, municipality_id) VALUES('username2022@mail.fi', 'username2022', 'Asdfghjk', 105);
-INSERT INTO user(email, username, password, municipality_id) VALUES('username23@mail.fi', 'username23', 'Qwertyui', 11);
-
-INSERT INTO plant(name, price, imagename, description, instruction, user_id) 
-VALUES('Peikonlehti', 3, 'dasjdsalkdj832', 'Isolehtinen kasvi, joka tekee ilmajuuria.', 'Peikonlehti tarvitsee paljon vettä ja valoa.', 2);
-INSERT INTO plant(name, price, imagename, description, instruction, user_id) 
-VALUES('Aloevera', 2, 'asdsaddasd2sdfe', 'Isosta mehikasvista otettu pistokas.', 'Hiekkainen kasvualusta ja kastelu vain tarvittaessa.', 1);
-INSERT INTO plant(name, price, imagename, description, instruction, user_id) 
-VALUES('Anopinkieli', 1, 'asdsaddasd2sdfe', 'Vihreäraidallinen anopinkieli, suorat lehdet.', 'Hiekkainen kasvualusta ja kastelu vain tarvittaessa.', 2);
-
-INSERT INTO plantdelivery(plant_id, delivery_id) VALUES(1, 1);
-INSERT INTO plantdelivery(plant_id, delivery_id) VALUES(1, 2);
-INSERT INTO plantdelivery(plant_id, delivery_id) VALUES (2, 2);
-INSERT INTO plantdelivery(plant_id, delivery_id) VALUES (3, 1);
+INSERT INTO user(email, username, password, municipality_id, role) VALUES('admin@mail.fi', 'admin', '$2a$10$7Wla6PcHN/eVoxkLprINnubcpfiqZr0oQUP93vkBkyx3X6FZrv..u', 4, 0);
+INSERT INTO user(email, username, password, municipality_id) VALUES('mattimeika@mail.fi', 'MattiMeikalainen', '$2a$10$JYkYht7rE5KGo.zQXgxwBuYuJ/Q7iP4GAIuKLrik2IGktxrAjZK4y', 85);
 
 DROP USER if EXISTS psuser@localhost;
 CREATE USER psuser@localhost IDENTIFIED BY 'peikonlehti';

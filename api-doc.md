@@ -1,6 +1,6 @@
 # Pistokkaat RESP API
 
-REST API for school course
+Pistokkaat REST API's documentation
 
 ## API Reference
 
